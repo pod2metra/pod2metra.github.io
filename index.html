@@ -113,6 +113,15 @@ dialog#ask::backdrop { background: rgba(10, 12, 18, .55); }
 .ask-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
 button.btn { cursor: pointer; }
 .ask input, .ask select, .ask textarea { border-color: var(--muted); }
+.ask fieldset.pick { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; }
+.ask fieldset.pick[hidden] { display: none; }
+.pick legend { padding: 0; margin-bottom: 8px; font-size: .85rem; color: var(--muted); }
+.ask .pick label { display: block; position: relative; gap: 0; }
+.pick input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; }
+.pick span { display: inline-block; font-family: var(--mono); font-size: .84rem; line-height: 1.2; padding: 9px 14px; border-radius: 999px; border: 1px solid var(--muted); color: var(--ink); cursor: pointer; }
+.pick span:hover { border-color: var(--accent); }
+.pick input:checked + span { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.pick input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
 .ask-fallback { margin: 0; font-size: .9rem; color: var(--muted); }
 .linkish { font: inherit; color: var(--accent); background: none; border: 0; padding: 0; text-decoration: underline; cursor: pointer; }
 .btn { min-height: 44px; }
@@ -426,7 +435,7 @@ a.chip:hover { background: var(--accent); color: var(--on-accent); }
     <label>Your email<input name="email" type="email" required autocomplete="email"></label>
     <label>Company or organizer<input name="org" autocomplete="organization"></label>
     <label data-only="speak">Event, date and place<input name="event" placeholder="e.g. Tech Summit, May 2027, Porto"></label>
-    <label data-only="advice">What do you need help with?<select name="topic"><option>Platform architecture</option><option>Engineering team setup</option><option>AI agents in delivery</option><option>Something else</option></select></label>
+    <fieldset class="pick" data-only="advice"><legend>What do you need help with?</legend><label><input type="radio" name="topic" value="Platform architecture" checked><span>Platform architecture</span></label><label><input type="radio" name="topic" value="Engineering team setup"><span>Engineering team setup</span></label><label><input type="radio" name="topic" value="AI agents in delivery"><span>AI agents in delivery</span></label><label><input type="radio" name="topic" value="Something else"><span>Something else</span></label></fieldset>
     <label>Details<textarea name="msg" rows="5" required></textarea></label>
     <div class="ask-actions"><button type="button" class="btn ghost" data-close>Close</button><button type="submit" class="btn">Open email</button></div>
     <p class="ask-fallback" role="status" hidden>Mail app didn't open? <button type="button" class="linkish" data-copy>Copy message</button> and send it to <b data-addr></b>.</p>
@@ -437,7 +446,7 @@ var T={speak:{h:"Invite me to speak",s:"Speaking invitation"},advice:{h:"Ask for
 document.querySelectorAll("[data-form]").forEach(function(b){b.addEventListener("click",function(){kind=b.dataset.form;d.querySelector("#ask-h").textContent=T[kind].h;
 d.querySelectorAll("[data-only]").forEach(function(l){var on=l.dataset.only===kind;l.hidden=!on;l.querySelectorAll("input,select").forEach(function(i){i.disabled=!on;});});fb.hidden=true;fb.querySelector("[data-copy]").textContent="Copy message";d.showModal();});});
 d.querySelector("[data-close]").addEventListener("click",function(){d.close();});
-f.addEventListener("submit",function(e){e.preventDefault();var v=function(n){var x=f.elements[n];return x&&!x.disabled?x.value.trim():"";};
+f.addEventListener("submit",function(e){e.preventDefault();var v=function(n){var x=f.elements[n];if(!x)return"";var e=x.tagName?x:x[0];return e.disabled?"":(x.value||"").trim();};
 var subj=T[kind].s+(v("org")?" — "+v("org"):"");
 var L=["Name: "+v("name"),"Email: "+v("email")];if(v("org"))L.push("Organization: "+v("org"));if(v("event"))L.push("Event: "+v("event"));if(v("topic"))L.push("Topic: "+v("topic"));L.push("",v("msg"));
 var to=d.dataset.u+"@"+d.dataset.d;fb.querySelector("[data-addr]").textContent=to;msg="Subject: "+subj+"\n\n"+L.join("\n");location.href="mailto:"+to+"?subject="+encodeURIComponent(subj)+"&body="+encodeURIComponent(L.join("\n"));setTimeout(function(){fb.hidden=false;},1200);});fb.querySelector("[data-copy]").addEventListener("click",function(){var b=this;navigator.clipboard.writeText(msg).then(function(){b.textContent="Copied";});});d.addEventListener("click",function(e){if(e.target===d)d.close();});})();</script>
