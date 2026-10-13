@@ -364,10 +364,11 @@ a.chip:hover { background: var(--accent); color: var(--on-accent); }
         <h2 id="contact-h">Get in touch</h2>
         <p>Open to talks about AI-native engineering, platform architecture and technical partnerships.</p>
       </header>
-      <div class="contact-links"><a href="https://www.linkedin.com/in/pod2metra" target="_blank" rel="noopener">linkedin.com/in/pod2metra ↗</a><a href="https://github.com/pod2metra" target="_blank" rel="noopener">github.com/pod2metra ↗</a></div>
+      <div class="contact-links"><a class="mail" data-u="contact.sabramov" data-d="gmail.com">contact.sabramov at gmail.com</a><a href="https://www.linkedin.com/in/pod2metra" target="_blank" rel="noopener">linkedin.com/in/pod2metra ↗</a><a href="https://github.com/pod2metra" target="_blank" rel="noopener">github.com/pod2metra ↗</a></div>
     </section>
   </div>
 
 </main>
+<script>document.querySelectorAll("a.mail").forEach(function(a){var e=a.dataset.u+"@"+a.dataset.d;a.href="mailto:"+e;a.textContent=e+" ✉";});</script>
 </body>
 </html>
