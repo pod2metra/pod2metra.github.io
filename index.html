@@ -97,6 +97,17 @@ svg.line{fill:none!important;stroke:currentColor;stroke-width:2;stroke-linecap:r
 .contact a:focus-visible { outline-color: var(--on-accent); }
 a.chip:focus-visible { background: var(--accent); color: var(--on-accent); }
 @media (max-width: 560px) { .ico { width: 40px; height: 40px; } .ico svg { width: 18px; height: 18px; } }
+dialog#ask { border: 1px solid var(--line); border-radius: 20px; padding: 0; background: var(--surface); color: var(--ink); width: min(520px, calc(100vw - 32px)); }
+dialog#ask::backdrop { background: rgba(10, 12, 18, .55); }
+.ask { display: grid; gap: 14px; padding: 28px; }
+.ask h2 { margin: 0; }
+.ask-note { margin: -6px 0 4px; color: var(--muted); font-size: .9rem; }
+.ask label { display: grid; gap: 6px; font-size: .85rem; color: var(--muted); }
+.ask label[hidden] { display: none; }
+.ask input, .ask select, .ask textarea { font: inherit; font-size: 1rem; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+.ask input:focus, .ask select:focus, .ask textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.ask-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+button.btn { cursor: pointer; }
 a.chip:hover { background: var(--accent); color: var(--on-accent); }
 .thesis { font-family: var(--display); font-weight: 600; font-size: clamp(1.6rem, 4.2vw, 2.9rem); line-height: 1.12; letter-spacing: -.025em; max-width: 30ch; }
 .thesis em { font-style: normal; color: var(--accent); display: block; }
@@ -220,7 +231,7 @@ a.chip:hover { background: var(--accent); color: var(--on-accent); }
     </div>
     <p class="thesis">I design the architecture. <em>AI agent teams build it.</em> Independent reviewers check every change before it ships.</p>
     <p class="lede">I build high-traffic data platforms and the teams behind them. Fifteen years in, I run engineering as a system: clear architecture, small focused teams, and AI agents that multiply what those teams ship.</p>
-    <div class="offer"><p><b>Speaking &amp; advisory.</b> Talks on AI-native engineering; advice on platform architecture, engineering teams and bringing AI agents into delivery.</p><div class="offer-cta"><a class="btn mail" data-u="contact.sabramov" data-d="gmail.com" data-s="Speaking invitation">Invite me to speak</a><a class="btn ghost mail" data-u="contact.sabramov" data-d="gmail.com" data-s="Advisory request">Ask for advice</a></div></div>
+    <div class="offer"><p><b>Speaking &amp; advisory.</b> Talks on AI-native engineering; advice on platform architecture, engineering teams and bringing AI agents into delivery.</p><div class="offer-cta"><button type="button" class="btn" data-form="speak">Invite me to speak</button><button type="button" class="btn ghost" data-form="advice">Ask for advice</button></div></div>
   </header>
 
   <section class="metrics" aria-label="Results">
@@ -384,6 +395,28 @@ a.chip:hover { background: var(--accent); color: var(--on-accent); }
   </div>
 
 </main>
+<dialog id="ask" aria-labelledby="ask-h" data-u="contact.sabramov" data-d="gmail.com">
+  <form class="ask">
+    <h2 id="ask-h">Invite me to speak</h2>
+    <p class="ask-note">Sending opens an email in your mail app with everything filled in.</p>
+    <label>Your name<input name="name" required autocomplete="name"></label>
+    <label>Your email<input name="email" type="email" required autocomplete="email"></label>
+    <label>Company or organizer<input name="org" autocomplete="organization"></label>
+    <label data-only="speak">Event, date and place<input name="event" placeholder="e.g. Tech Summit, May 2027, Porto"></label>
+    <label data-only="advice">What do you need help with?<select name="topic"><option>Platform architecture</option><option>Engineering team setup</option><option>AI agents in delivery</option><option>Something else</option></select></label>
+    <label>Details<textarea name="msg" rows="5" required></textarea></label>
+    <div class="ask-actions"><button type="button" class="btn ghost" data-close>Cancel</button><button type="submit" class="btn">Open email</button></div>
+  </form>
+</dialog>
+<script>(function(){var d=document.getElementById("ask"),f=d.querySelector("form"),kind="speak";
+var T={speak:{h:"Invite me to speak",s:"Speaking invitation"},advice:{h:"Ask for advice",s:"Advisory request"}};
+document.querySelectorAll("[data-form]").forEach(function(b){b.addEventListener("click",function(){kind=b.dataset.form;d.querySelector("#ask-h").textContent=T[kind].h;
+d.querySelectorAll("[data-only]").forEach(function(l){var on=l.dataset.only===kind;l.hidden=!on;l.querySelectorAll("input,select").forEach(function(i){i.disabled=!on;});});d.showModal();});});
+d.querySelector("[data-close]").addEventListener("click",function(){d.close();});
+f.addEventListener("submit",function(e){e.preventDefault();var v=function(n){var x=f.elements[n];return x&&!x.disabled?x.value.trim():"";};
+var subj=T[kind].s+(v("org")?" — "+v("org"):"");
+var L=["Name: "+v("name"),"Email: "+v("email")];if(v("org"))L.push("Organization: "+v("org"));if(v("event"))L.push("Event: "+v("event"));if(v("topic"))L.push("Topic: "+v("topic"));L.push("",v("msg"));
+location.href="mailto:"+d.dataset.u+"@"+d.dataset.d+"?subject="+encodeURIComponent(subj)+"&body="+encodeURIComponent(L.join("\n"));d.close();f.reset();});})();</script>
 <script>document.querySelectorAll("a.mail").forEach(function(a){var e=a.dataset.u+"@"+a.dataset.d;a.href="mailto:"+e+(a.dataset.s?"?subject="+encodeURIComponent(a.dataset.s):"");var t=a.querySelector("[data-t]");if(t)t.textContent=e;});</script>
 </body>
 </html>
