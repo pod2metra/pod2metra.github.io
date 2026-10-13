@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Sergei Abramov — CTO, AI-native engineering</title>
-<meta name="description" content="Sergei Abramov — CTO, 15 years in backend and cloud platforms. I design the architecture, AI agent teams build it, independent reviewers check every change.">
+<meta name="description" content="CTO with 15 years in backend and cloud platforms. I design the architecture, AI agent teams build it. Speaking and advisory on AI-native engineering.">
 <link rel="canonical" href="https://pod2metra.github.io/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Sergei Abramov">
-<meta property="og:title" content="Sergei Abramov — CTO">
-<meta property="og:description" content="Sergei Abramov — CTO, 15 years in backend and cloud platforms. I design the architecture, AI agent teams build it, independent reviewers check every change.">
+<meta property="og:title" content="Sergei Abramov — CTO, AI-native engineering">
+<meta property="og:description" content="Sergei Abramov — CTO, 15 years in backend and cloud platforms. I design the architecture, AI agent teams build it, independent reviewers check every change. Speaking and advisory on AI-native engineering.">
 <meta property="og:url" content="https://pod2metra.github.io/">
 <meta property="og:image" content="https://pod2metra.github.io/assets/photo.jpg">
 <meta property="og:image:alt" content="Portrait of Sergei Abramov">
@@ -112,6 +112,12 @@ dialog#ask::backdrop { background: rgba(10, 12, 18, .55); }
 .ask input:focus, .ask select:focus, .ask textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 .ask-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
 button.btn { cursor: pointer; }
+.ask input, .ask select, .ask textarea { border-color: var(--muted); }
+.ask-fallback { margin: 0; font-size: .9rem; color: var(--muted); }
+.linkish { font: inherit; color: var(--accent); background: none; border: 0; padding: 0; text-decoration: underline; cursor: pointer; }
+.btn { min-height: 44px; }
+@media (max-width: 560px) { .stack li.more button { min-height: 40px; } }
+
 a.chip:hover { background: var(--accent); color: var(--on-accent); }
 .thesis { font-family: var(--display); font-weight: 600; font-size: clamp(1.6rem, 4.2vw, 2.9rem); line-height: 1.12; letter-spacing: -.025em; max-width: 30ch; }
 .thesis em { font-style: normal; color: var(--accent); display: block; }
@@ -129,7 +135,7 @@ a.chip:hover { background: var(--accent); color: var(--on-accent); }
 .step { display: grid; grid-template-rows: auto auto auto 1fr auto; gap: 10px; min-width: 0; position: relative; }
 .node { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--surface); border: 2px solid var(--accent); color: var(--accent); font-family: var(--mono); font-size: .82rem; font-weight: 500; position: relative; z-index: 1; }
 .step.gate .node { border-color: var(--pass); color: var(--pass); background: var(--pass-soft); }
-.step .kind { font-family: var(--mono); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+.step .kind { font-family: var(--mono); font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
 .step h3 { font-size: 1.15rem; font-weight: 600; }
 .step p { color: var(--muted); font-size: .94rem; }
 .tag { font-family: var(--mono); font-size: .8rem; color: var(--accent); background: var(--accent-soft); padding: 5px 10px; border-radius: 999px; justify-self: start; align-self: end; }
@@ -299,7 +305,7 @@ a.chip:hover { background: var(--accent); color: var(--on-accent); }
           <span class="kind">Ship</span>
           <h3>Release</h3>
           <p>Approved changes go to production, including custom features for individual clients.</p>
-          <span class="tag">6+ times more tasks</span>
+          <span class="tag">custom client features</span>
         </article>
         <div class="loop" aria-hidden="true"><span>rejected → back to build</span></div>
       </div>
@@ -412,34 +418,35 @@ a.chip:hover { background: var(--accent); color: var(--on-accent); }
   </div>
 
 </main>
-<dialog id="ask" aria-labelledby="ask-h" data-u="contact.sabramov" data-d="gmail.com">
+<dialog id="ask" aria-labelledby="ask-h" aria-describedby="ask-note" data-u="contact.sabramov" data-d="gmail.com">
   <form class="ask">
     <h2 id="ask-h">Invite me to speak</h2>
-    <p class="ask-note">Sending opens an email in your mail app with everything filled in.</p>
+    <p class="ask-note" id="ask-note">Sending opens an email in your mail app with everything filled in.</p>
     <label>Your name<input name="name" required autocomplete="name"></label>
     <label>Your email<input name="email" type="email" required autocomplete="email"></label>
     <label>Company or organizer<input name="org" autocomplete="organization"></label>
     <label data-only="speak">Event, date and place<input name="event" placeholder="e.g. Tech Summit, May 2027, Porto"></label>
     <label data-only="advice">What do you need help with?<select name="topic"><option>Platform architecture</option><option>Engineering team setup</option><option>AI agents in delivery</option><option>Something else</option></select></label>
     <label>Details<textarea name="msg" rows="5" required></textarea></label>
-    <div class="ask-actions"><button type="button" class="btn ghost" data-close>Cancel</button><button type="submit" class="btn">Open email</button></div>
+    <div class="ask-actions"><button type="button" class="btn ghost" data-close>Close</button><button type="submit" class="btn">Open email</button></div>
+    <p class="ask-fallback" role="status" hidden>Mail app didn't open? <button type="button" class="linkish" data-copy>Copy message</button> and send it to <b data-addr></b>.</p>
   </form>
 </dialog>
-<script>(function(){var d=document.getElementById("ask"),f=d.querySelector("form"),kind="speak";
+<script>(function(){var d=document.getElementById("ask"),f=d.querySelector("form"),fb=d.querySelector(".ask-fallback"),kind="speak",msg="";
 var T={speak:{h:"Invite me to speak",s:"Speaking invitation"},advice:{h:"Ask for advice",s:"Advisory request"}};
 document.querySelectorAll("[data-form]").forEach(function(b){b.addEventListener("click",function(){kind=b.dataset.form;d.querySelector("#ask-h").textContent=T[kind].h;
-d.querySelectorAll("[data-only]").forEach(function(l){var on=l.dataset.only===kind;l.hidden=!on;l.querySelectorAll("input,select").forEach(function(i){i.disabled=!on;});});d.showModal();});});
+d.querySelectorAll("[data-only]").forEach(function(l){var on=l.dataset.only===kind;l.hidden=!on;l.querySelectorAll("input,select").forEach(function(i){i.disabled=!on;});});fb.hidden=true;fb.querySelector("[data-copy]").textContent="Copy message";d.showModal();});});
 d.querySelector("[data-close]").addEventListener("click",function(){d.close();});
 f.addEventListener("submit",function(e){e.preventDefault();var v=function(n){var x=f.elements[n];return x&&!x.disabled?x.value.trim():"";};
 var subj=T[kind].s+(v("org")?" — "+v("org"):"");
 var L=["Name: "+v("name"),"Email: "+v("email")];if(v("org"))L.push("Organization: "+v("org"));if(v("event"))L.push("Event: "+v("event"));if(v("topic"))L.push("Topic: "+v("topic"));L.push("",v("msg"));
-location.href="mailto:"+d.dataset.u+"@"+d.dataset.d+"?subject="+encodeURIComponent(subj)+"&body="+encodeURIComponent(L.join("\n"));d.close();f.reset();});})();</script>
+var to=d.dataset.u+"@"+d.dataset.d;fb.querySelector("[data-addr]").textContent=to;msg="Subject: "+subj+"\n\n"+L.join("\n");location.href="mailto:"+to+"?subject="+encodeURIComponent(subj)+"&body="+encodeURIComponent(L.join("\n"));setTimeout(function(){fb.hidden=false;},1200);});fb.querySelector("[data-copy]").addEventListener("click",function(){var b=this;navigator.clipboard.writeText(msg).then(function(){b.textContent="Copied";});});d.addEventListener("click",function(e){if(e.target===d)d.close();});})();</script>
 <script>(function(){function fit(ul){var m=ul.querySelector("li.more");if(m)m.remove();var lis=[].slice.call(ul.querySelectorAll("li"));lis.forEach(function(l){l.hidden=false;});if(ul.dataset.open)return;
 var row1=function(el){return el.getBoundingClientRect().top-ul.getBoundingClientRect().top<12;};if(lis.every(row1))return;
 var more=document.createElement("li");more.className="more";var b=document.createElement("button");b.type="button";more.appendChild(b);ul.appendChild(more);
 for(var i=lis.length-1;i>0;i--){lis[i].hidden=true;var n=lis.filter(function(l){return l.hidden;}).length;b.textContent="+"+n+" more";
 if(row1(more)&&lis.every(function(l){return l.hidden||row1(l);}))break;}
-b.setAttribute("aria-label","Show all "+lis.length);b.onclick=function(){ul.dataset.open="1";fit(ul);};}
+b.setAttribute("aria-expanded","false");b.onclick=function(){var first=lis.filter(function(l){return l.hidden;})[0];ul.dataset.open="1";fit(ul);if(first){first.tabIndex=-1;first.focus();}};}
 function all(){document.querySelectorAll(".stack-groups .stack").forEach(fit);}
 var t;window.addEventListener("resize",function(){clearTimeout(t);t=setTimeout(all,120);});
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(all);all();})();</script>
