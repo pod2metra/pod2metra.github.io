@@ -72,6 +72,10 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-
 .tile > header { display: grid; gap: 10px; }
 .tile h2 { font-size: clamp(1.5rem, 3vw, 2.1rem); font-weight: 700; }
 .tile > header p { color: var(--muted); max-width: 70ch; }
+.tile > header.split-head { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px 40px; align-items: start; }
+.head-text { display: grid; gap: 10px; }
+.split-head .notes { grid-template-columns: minmax(0, 1fr); margin-top: 0; }
+
 
 /* hero */
 .hero { background: transparent; border-color: transparent; color: var(--ink); gap: 30px; padding: clamp(20px, 4vw, 40px) clamp(4px, 1vw, 8px) 12px; }
@@ -191,7 +195,7 @@ a.chip:hover { background: var(--accent); color: var(--on-accent); }
 
 @media (max-width: 860px) {
   .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .split, .bottom, .notes { grid-template-columns: minmax(0, 1fr); }
+  .split, .bottom, .notes, .tile > header.split-head { grid-template-columns: minmax(0, 1fr); }
   .steps { grid-template-columns: minmax(0, 1fr); gap: 26px; }
   .steps::before { top: 18px; bottom: 18px; left: 17px; right: auto; width: 2px; height: auto; }
   .step { grid-template-columns: 36px minmax(0, 1fr); grid-template-rows: none; column-gap: 16px; row-gap: 8px; }
@@ -242,10 +246,22 @@ a.chip:hover { background: var(--accent); color: var(--on-accent); }
   </section>
 
   <section class="tile" aria-labelledby="pipe-h">
-    <header>
+    <header class="split-head">
+      <div class="head-text">
       <span class="eyebrow">How I run engineering now</span>
       <h2 id="pipe-h">One change, four stages</h2>
       <p>I have worked this way since early 2026. Speed comes from the agents. Safety comes from the order of the work: the plan comes first, and nothing ships until someone other than its author has checked it.</p>
+      </div>
+      <div class="notes">
+        <div class="note">
+          <strong>10+ in parallel</strong>
+          <span>Specialists are scaled out when the queue grows, so more than ten agents can work at once across sessions.</span>
+        </div>
+        <div class="note">
+          <strong>MCP servers</strong>
+          <span>Agents get controlled access to the platform and internal tools, so they work against real systems within fixed permissions.</span>
+        </div>
+      </div>
     </header>
     <div>
       <div class="steps">
@@ -268,26 +284,16 @@ a.chip:hover { background: var(--accent); color: var(--on-accent); }
           <span class="kind">Check</span>
           <h3>Review and test</h3>
           <p>Separate reviewer and tester agents check every change against integration, end-to-end and infrastructure tests. Rejected work goes back to the coding agents.</p>
-          <span class="tag">100% integration test coverage</span>
+          <span class="tag">100% integration coverage</span>
         </article>
         <article class="step">
           <span class="node">04</span>
           <span class="kind">Ship</span>
           <h3>Release</h3>
           <p>Approved changes go to production, including custom features for individual clients.</p>
-          <span class="tag">6+ times more tasks per sprint</span>
+          <span class="tag">6+ times more tasks</span>
         </article>
         <div class="loop" aria-hidden="true"><span>rejected → back to build</span></div>
-      </div>
-      <div class="notes">
-        <div class="note">
-          <strong>10+ in parallel</strong>
-          <span>Specialists are scaled out when the queue grows, so more than ten agents can work at once across sessions.</span>
-        </div>
-        <div class="note">
-          <strong>MCP servers</strong>
-          <span>Agents get controlled access to the platform and internal tools, so they work against real systems within fixed permissions.</span>
-        </div>
       </div>
     </div>
   </section>
