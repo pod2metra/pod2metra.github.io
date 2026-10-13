@@ -189,6 +189,9 @@ a.chip:hover { background: var(--accent); color: var(--on-accent); }
 .stack-groups dt { font-family: var(--mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 .stack-groups dd { margin: 0; }
 @media (max-width: 560px) { .stack-groups > div { grid-template-columns: minmax(0, 1fr); gap: 8px; } }
+.stack li[hidden] { display: none; }
+.stack li.more { padding: 0; background: none; }
+.stack li.more button { font: inherit; font-family: var(--mono); font-size: .84rem; line-height: 1.2; padding: 7px 13px; border-radius: 999px; border: 1px dashed var(--line); background: transparent; color: var(--accent); cursor: pointer; }
 .stack li { font-family: var(--mono); font-size: .84rem; line-height: 1.2; padding: 8px 14px; border-radius: 999px; background: var(--bg); }
 .contact { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 .contact h2 { color: var(--on-accent); }
@@ -393,7 +396,7 @@ a.chip:hover { background: var(--accent); color: var(--on-accent); }
         <h2 id="stack-h">What I build with</h2>
       </header>
       <dl class="stack-groups">
-        <div><dt>AI</dt><dd><ul class="stack"><li>AI coding agents</li><li>MCP</li></ul></dd></div>
+        <div><dt>AI</dt><dd><ul class="stack"><li>AI coding agents</li><li>LLMs</li><li>MCP</li></ul></dd></div>
         <div><dt>Backend</dt><dd><ul class="stack"><li>Python</li><li>Django</li><li>FastAPI</li><li>Flask</li><li>aiohttp</li><li>Celery</li></ul></dd></div>
         <div><dt>Data</dt><dd><ul class="stack"><li>ClickHouse</li><li>Kafka</li><li>PostgreSQL</li><li>Redis</li></ul></dd></div>
         <div><dt>Infrastructure</dt><dd><ul class="stack"><li>AWS</li><li>Kubernetes</li><li>Docker</li><li>CI/CD</li><li>Sentry</li></ul></dd></div>
@@ -431,6 +434,15 @@ f.addEventListener("submit",function(e){e.preventDefault();var v=function(n){var
 var subj=T[kind].s+(v("org")?" — "+v("org"):"");
 var L=["Name: "+v("name"),"Email: "+v("email")];if(v("org"))L.push("Organization: "+v("org"));if(v("event"))L.push("Event: "+v("event"));if(v("topic"))L.push("Topic: "+v("topic"));L.push("",v("msg"));
 location.href="mailto:"+d.dataset.u+"@"+d.dataset.d+"?subject="+encodeURIComponent(subj)+"&body="+encodeURIComponent(L.join("\n"));d.close();f.reset();});})();</script>
+<script>(function(){function fit(ul){var m=ul.querySelector("li.more");if(m)m.remove();var lis=[].slice.call(ul.querySelectorAll("li"));lis.forEach(function(l){l.hidden=false;});if(ul.dataset.open)return;
+var row1=function(el){return el.getBoundingClientRect().top-ul.getBoundingClientRect().top<12;};if(lis.every(row1))return;
+var more=document.createElement("li");more.className="more";var b=document.createElement("button");b.type="button";more.appendChild(b);ul.appendChild(more);
+for(var i=lis.length-1;i>0;i--){lis[i].hidden=true;var n=lis.filter(function(l){return l.hidden;}).length;b.textContent="+"+n+" more";
+if(row1(more)&&lis.every(function(l){return l.hidden||row1(l);}))break;}
+b.setAttribute("aria-label","Show all "+lis.length);b.onclick=function(){ul.dataset.open="1";fit(ul);};}
+function all(){document.querySelectorAll(".stack-groups .stack").forEach(fit);}
+var t;window.addEventListener("resize",function(){clearTimeout(t);t=setTimeout(all,120);});
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(all);all();})();</script>
 <script>document.querySelectorAll("a.mail").forEach(function(a){var e=a.dataset.u+"@"+a.dataset.d;a.href="mailto:"+e+(a.dataset.s?"?subject="+encodeURIComponent(a.dataset.s):"");var t=a.querySelector("[data-t]");if(t)t.textContent=e;});</script>
 </body>
 </html>
