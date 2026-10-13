@@ -4,16 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Sergei Abramov</title>
+<title>Sergei Abramov — CTO, AI-native engineering</title>
 <meta name="description" content="Sergei Abramov — CTO, 15 years in backend and cloud platforms. I design the architecture, AI agent teams build it, independent reviewers check every change.">
 <link rel="canonical" href="https://pod2metra.github.io/">
-<meta property="og:type" content="profile">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Sergei Abramov">
 <meta property="og:title" content="Sergei Abramov — CTO">
 <meta property="og:description" content="Sergei Abramov — CTO, 15 years in backend and cloud platforms. I design the architecture, AI agent teams build it, independent reviewers check every change.">
 <meta property="og:url" content="https://pod2metra.github.io/">
 <meta property="og:image" content="https://pod2metra.github.io/assets/photo.jpg">
+<meta property="og:image:alt" content="Portrait of Sergei Abramov">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#EEF0F4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0B0D11" media="(prefers-color-scheme: dark)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
@@ -29,11 +34,6 @@
   --accent-soft: #EBEEFC;
   --pass: #1C7A50;
   --pass-soft: #E2F3EA;
-  --hero: #12151B;
-  --hero-ink: #F3F4F7;
-  --hero-muted: #A9B0BE;
-  --hero-accent: #9DADFF;
-  --hero-line: #2A2F3A;
   --on-accent: #FFFFFF;
   --seg1: #3347D1; --seg2: #7C8BE6; --seg3: #AEB8F0; --seg4: #CDD3F6; --seg5: #E3E7FA;
   --display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
@@ -45,7 +45,7 @@
   :root:not([data-theme="light"]) {
     --bg: #0B0D11; --surface: #14171E; --ink: #E9EBF0; --muted: #9AA2B1; --line: #252A34;
     --accent: #9DADFF; --accent-soft: #1E2547; --pass: #66C99C; --pass-soft: #14302A;
-    --hero: #1B2030; --hero-ink: #F3F4F7; --hero-muted: #A9B0BE; --hero-accent: #9DADFF; --hero-line: #2E3546;
+   
     --on-accent: #10142A;
     --seg1: #9DADFF; --seg2: #6F7FD6; --seg3: #4B58A3; --seg4: #353F75; --seg5: #262D52;
     color-scheme: dark;
@@ -54,7 +54,6 @@
 :root[data-theme="dark"] {
   --bg: #0B0D11; --surface: #14171E; --ink: #E9EBF0; --muted: #9AA2B1; --line: #252A34;
   --accent: #9DADFF; --accent-soft: #1E2547; --pass: #66C99C; --pass-soft: #14302A;
-  --hero: #1B2030; --hero-ink: #F3F4F7; --hero-muted: #A9B0BE; --hero-accent: #9DADFF; --hero-line: #2E3546;
   --on-accent: #10142A;
   --seg1: #9DADFF; --seg2: #6F7FD6; --seg3: #4B58A3; --seg4: #353F75; --seg5: #262D52;
   color-scheme: dark;
@@ -68,7 +67,7 @@ h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-he
 p { margin: 0; }
 a { color: var(--accent); text-underline-offset: 3px; }
 a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
-.eyebrow { font-family: var(--mono); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.eyebrow { font-family: var(--mono); font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
 .tile { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: clamp(22px, 4vw, 40px); display: grid; gap: 28px; min-width: 0; }
 .tile > header { display: grid; gap: 10px; }
 .tile h2 { font-size: clamp(1.5rem, 3vw, 2.1rem); font-weight: 700; }
@@ -88,6 +87,16 @@ a.chip { color: var(--accent); text-decoration: none; border-color: var(--accent
 .ico svg,.contact a svg{width:15px;height:15px;fill:currentColor;flex:none}
 svg.line{fill:none!important;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .contact a{display:inline-flex;align-items:center;gap:9px}
+.offer { margin-top: 22px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; max-width: 900px; }
+.offer p { margin: 0; flex: 1 1 360px; color: var(--muted); }
+.offer p b { color: var(--ink); }
+.offer-cta { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn { font-family: var(--mono); font-size: .85rem; text-decoration: none; padding: 10px 16px; border-radius: 999px; background: var(--accent); color: var(--on-accent); border: 1px solid var(--accent); }
+.btn.ghost { background: transparent; color: var(--accent); }
+.btn:hover, .btn:focus-visible { opacity: .9; }
+.contact a:focus-visible { outline-color: var(--on-accent); }
+a.chip:focus-visible { background: var(--accent); color: var(--on-accent); }
+@media (max-width: 560px) { .ico { width: 40px; height: 40px; } .ico svg { width: 18px; height: 18px; } }
 a.chip:hover { background: var(--accent); color: var(--on-accent); }
 .thesis { font-family: var(--display); font-weight: 600; font-size: clamp(1.6rem, 4.2vw, 2.9rem); line-height: 1.12; letter-spacing: -.025em; max-width: 30ch; }
 .thesis em { font-style: normal; color: var(--accent); display: block; }
@@ -108,10 +117,10 @@ a.chip:hover { background: var(--accent); color: var(--on-accent); }
 .step .kind { font-family: var(--mono); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
 .step h3 { font-size: 1.15rem; font-weight: 600; }
 .step p { color: var(--muted); font-size: .94rem; }
-.tag { font-family: var(--mono); font-size: .76rem; color: var(--accent); background: var(--accent-soft); padding: 5px 10px; border-radius: 999px; justify-self: start; align-self: end; }
+.tag { font-family: var(--mono); font-size: .8rem; color: var(--accent); background: var(--accent-soft); padding: 5px 10px; border-radius: 999px; justify-self: start; align-self: end; }
 .step.gate .tag { color: var(--pass); background: var(--pass-soft); }
 .spec { display: flex; flex-wrap: wrap; gap: 6px; align-self: end; }
-.spec span { font-family: var(--mono); font-size: .74rem; padding: 3px 8px; border: 1px solid var(--line); border-radius: 6px; }
+.spec span { font-family: var(--mono); font-size: .8rem; padding: 3px 8px; border: 1px solid var(--line); border-radius: 6px; }
 .spec span.more { color: var(--muted); border-style: dashed; }
 .steps { margin-top: 56px; }
 .loop { position: absolute; top: -32px; z-index: 2; left: calc((100% - 84px) / 4 + 46px); width: calc((100% - 84px) / 4 + 28px); height: 22px; border: 1.5px dashed var(--muted); border-bottom: 0; border-radius: 12px 12px 0 0; pointer-events: none; }
@@ -158,7 +167,7 @@ a.chip:hover { background: var(--accent); color: var(--on-accent); }
 @media (max-width: 560px) { .early { grid-template-columns: minmax(0, 1fr); gap: 0; } .early dd { margin-bottom: 8px; } }
 
 /* stack + contact */
-.bottom { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px; }
+.bottom { align-items: start; display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px; }
 .stack { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; align-items: center; align-self: start; }
 .stack li { font-family: var(--mono); font-size: .84rem; line-height: 1.2; padding: 8px 14px; border-radius: 999px; background: var(--bg); }
 .contact { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
@@ -211,13 +220,14 @@ a.chip:hover { background: var(--accent); color: var(--on-accent); }
     </div>
     <p class="thesis">I design the architecture. <em>AI agent teams build it.</em> Independent reviewers check every change before it ships.</p>
     <p class="lede">I build high-traffic data platforms and the teams behind them. Fifteen years in, I run engineering as a system: clear architecture, small focused teams, and AI agents that multiply what those teams ship.</p>
+    <div class="offer"><p><b>Speaking &amp; advisory.</b> Talks on AI-native engineering; advice on platform architecture, engineering teams and bringing AI agents into delivery.</p><div class="offer-cta"><a class="btn mail" data-u="contact.sabramov" data-d="gmail.com" data-s="Speaking invitation">Invite me to speak</a><a class="btn ghost mail" data-u="contact.sabramov" data-d="gmail.com" data-s="Advisory request">Ask for advice</a></div></div>
   </header>
 
   <section class="metrics" aria-label="Results">
     <div class="metric"><b>15</b><span>years building backend and cloud platforms</span></div>
-    <div class="metric"><b>0 → 20+</b><span>engineers hired and led as CTO</span></div>
-    <div class="metric"><b>25K+</b><span>requests per second on platforms I designed</span></div>
-    <div class="metric"><b>6+</b><span>times more delivered per sprint with AI agent teams</span></div>
+    <div class="metric"><b>0 → 20+</b><span>engineers hired and led as CTO at APPSULOVE</span></div>
+    <div class="metric"><b>25K+</b><span>RPS on the APPSULOVE platform I designed</span></div>
+    <div class="metric"><b>6+</b><span>times more tasks shipped per sprint with AI agent teams</span></div>
   </section>
 
   <section class="tile" aria-labelledby="pipe-h">
@@ -239,29 +249,29 @@ a.chip:hover { background: var(--accent); color: var(--on-accent); }
           <span class="node">02</span>
           <span class="kind">Build</span>
           <h3>Coding agents</h3>
-          <p>Six domain specialists, copied on demand when work piles up.</p>
+          <p>Six domain specialists, scaled out on demand when work piles up.</p>
           <div class="spec" aria-label="Specialists"><span>backend</span><span>data</span><span>integrations</span><span>frontend</span><span class="more">+2</span></div>
         </article>
         <article class="step gate">
           <span class="node">03</span>
           <span class="kind">Check</span>
           <h3>Review and test</h3>
-          <p>Separate reviewer and tester agents check every change. Rejected work goes back to the coding agents.</p>
-          <span class="tag">100% of services tested</span>
+          <p>Separate reviewer and tester agents check every change against integration, end-to-end and infrastructure tests. Rejected work goes back to the coding agents.</p>
+          <span class="tag">100% integration test coverage</span>
         </article>
         <article class="step">
           <span class="node">04</span>
           <span class="kind">Ship</span>
           <h3>Release</h3>
           <p>Approved changes go to production, including custom features for individual clients.</p>
-          <span class="tag">6+ times more per sprint</span>
+          <span class="tag">6+ times more tasks per sprint</span>
         </article>
         <div class="loop" aria-hidden="true"><span>rejected → back to build</span></div>
       </div>
       <div class="notes">
         <div class="note">
           <strong>10+ in parallel</strong>
-          <span>Specialists are copied when the queue grows, so more than ten agents can work at once across sessions.</span>
+          <span>Specialists are scaled out when the queue grows, so more than ten agents can work at once across sessions.</span>
         </div>
         <div class="note">
           <strong>MCP servers</strong>
@@ -311,7 +321,7 @@ a.chip:hover { background: var(--accent); color: var(--on-accent); }
       <article class="job now">
         <time>2024 – now</time>
         <div class="body"><h3>Chief Technology Officer <span>· Magify · remote</span></h3>
-        <p>BI and LiveOps platform for mobile game publishers and studios. Rebuilt delivery around AI agent teams: client integration cut from 4 months to 1, 6+ times more delivered per sprint.</p></div>
+        <p>BI and LiveOps platform for mobile game publishers and studios. Rebuilt delivery around AI agent teams: client integration cut from 4 months to 1, 6+ times more tasks shipped per sprint.</p></div>
       </article>
       <article class="job">
         <time>2022 – 2024</time>
@@ -367,13 +377,13 @@ a.chip:hover { background: var(--accent); color: var(--on-accent); }
     <section class="tile contact" aria-labelledby="contact-h">
       <header>
         <h2 id="contact-h">Get in touch</h2>
-        <p>Open to talks about AI-native engineering, platform architecture and technical partnerships.</p>
+        <p>I speak at conferences and meetups about running engineering with AI agent teams, and help companies with platform architecture, team setup and adopting AI in delivery. Email is the fastest way to reach me.</p>
       </header>
       <div class="contact-links"><a class="mail" data-u="contact.sabramov" data-d="gmail.com"><svg viewBox="0 0 24 24" aria-hidden="true" class="line"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg><span data-t>contact.sabramov at gmail.com</span></a><a href="https://www.linkedin.com/in/pod2metra" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg><span>linkedin.com/in/pod2metra</span></a><a href="https://github.com/pod2metra" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg><span>github.com/pod2metra</span></a></div>
     </section>
   </div>
 
 </main>
-<script>document.querySelectorAll("a.mail").forEach(function(a){var e=a.dataset.u+"@"+a.dataset.d;a.href="mailto:"+e;var t=a.querySelector("[data-t]");if(t)t.textContent=e;});</script>
+<script>document.querySelectorAll("a.mail").forEach(function(a){var e=a.dataset.u+"@"+a.dataset.d;a.href="mailto:"+e+(a.dataset.s?"?subject="+encodeURIComponent(a.dataset.s):"");var t=a.querySelector("[data-t]");if(t)t.textContent=e;});</script>
 </body>
 </html>
