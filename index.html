@@ -15,6 +15,44 @@
 <meta property="og:image" content="https://pod2metra.github.io/assets/photo.jpg">
 <meta property="og:image:alt" content="Portrait of Sergei Abramov">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Sergei Abramov — CTO, AI-native engineering">
+<meta name="twitter:description" content="I design the architecture, AI agent teams build it. Speaking and advisory on AI-native engineering.">
+<meta name="twitter:image" content="https://pod2metra.github.io/assets/photo.jpg">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "Person",
+ "name": "Sergei Abramov",
+ "url": "https://pod2metra.github.io/",
+ "image": "https://pod2metra.github.io/assets/photo.jpg",
+ "jobTitle": "CTO",
+ "worksFor": {
+  "@type": "Organization",
+  "name": "Magify"
+ },
+ "address": {
+  "@type": "PostalAddress",
+  "addressLocality": "Porto",
+  "addressCountry": "PT"
+ },
+ "description": "CTO with 15 years in backend and cloud platforms. Speaking and advisory on AI-native engineering and platform architecture.",
+ "knowsAbout": [
+  "AI-native engineering",
+  "AI coding agents",
+  "Platform architecture",
+  "Engineering management",
+  "Python",
+  "ClickHouse",
+  "Kafka",
+  "AWS",
+  "Kubernetes"
+ ],
+ "sameAs": [
+  "https://www.linkedin.com/in/pod2metra",
+  "https://github.com/pod2metra"
+ ]
+}
+</script>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="theme-color" content="#EEF0F4" media="(prefers-color-scheme: light)">
@@ -122,6 +160,10 @@ button.btn { cursor: pointer; }
 .pick span:hover { border-color: var(--accent); }
 .pick input:checked + span { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 .pick input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ask-actions { position: sticky; bottom: 0; background: var(--surface); padding-block: 12px; margin-block: -4px -12px; border-top: 1px solid var(--line); }
+.stack li:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.linkish { padding: 6px 2px; }
+@media (max-width: 560px) { .ask { padding: 20px; gap: 12px; } }
 .ask-fallback { margin: 0; font-size: .9rem; color: var(--muted); }
 .linkish { font: inherit; color: var(--accent); background: none; border: 0; padding: 0; text-decoration: underline; cursor: pointer; }
 .btn { min-height: 44px; }
@@ -436,9 +478,9 @@ a.chip:hover { background: var(--accent); color: var(--on-accent); }
     <label>Company or organizer<input name="org" autocomplete="organization"></label>
     <label data-only="speak">Event, date and place<input name="event" placeholder="e.g. Tech Summit, May 2027, Porto"></label>
     <fieldset class="pick" data-only="advice"><legend>What do you need help with?</legend><label><input type="radio" name="topic" value="Platform architecture" checked><span>Platform architecture</span></label><label><input type="radio" name="topic" value="Engineering team setup"><span>Engineering team setup</span></label><label><input type="radio" name="topic" value="AI agents in delivery"><span>AI agents in delivery</span></label><label><input type="radio" name="topic" value="Something else"><span>Something else</span></label></fieldset>
-    <label>Details<textarea name="msg" rows="5" required></textarea></label>
+    <label>Details<textarea name="msg" rows="3" required></textarea></label>
+        <p class="ask-fallback" role="status" hidden>Mail app didn't open? <button type="button" class="linkish" data-copy>Copy message</button> and send it to <b data-addr></b>.</p>
     <div class="ask-actions"><button type="button" class="btn ghost" data-close>Close</button><button type="submit" class="btn">Open email</button></div>
-    <p class="ask-fallback" role="status" hidden>Mail app didn't open? <button type="button" class="linkish" data-copy>Copy message</button> and send it to <b data-addr></b>.</p>
   </form>
 </dialog>
 <script>(function(){var d=document.getElementById("ask"),f=d.querySelector("form"),fb=d.querySelector(".ask-fallback"),kind="speak",msg="";
@@ -449,7 +491,7 @@ d.querySelector("[data-close]").addEventListener("click",function(){d.close();})
 f.addEventListener("submit",function(e){e.preventDefault();var v=function(n){var x=f.elements[n];if(!x)return"";var e=x.tagName?x:x[0];return e.disabled?"":(x.value||"").trim();};
 var subj=T[kind].s+(v("org")?" — "+v("org"):"");
 var L=["Name: "+v("name"),"Email: "+v("email")];if(v("org"))L.push("Organization: "+v("org"));if(v("event"))L.push("Event: "+v("event"));if(v("topic"))L.push("Topic: "+v("topic"));L.push("",v("msg"));
-var to=d.dataset.u+"@"+d.dataset.d;fb.querySelector("[data-addr]").textContent=to;msg="Subject: "+subj+"\n\n"+L.join("\n");location.href="mailto:"+to+"?subject="+encodeURIComponent(subj)+"&body="+encodeURIComponent(L.join("\n"));setTimeout(function(){fb.hidden=false;},1200);});fb.querySelector("[data-copy]").addEventListener("click",function(){var b=this;navigator.clipboard.writeText(msg).then(function(){b.textContent="Copied";});});d.addEventListener("click",function(e){if(e.target===d)d.close();});})();</script>
+var to=d.dataset.u+"@"+d.dataset.d;fb.querySelector("[data-addr]").textContent=to;msg="Subject: "+subj+"\n\n"+L.join("\n");location.href="mailto:"+to+"?subject="+encodeURIComponent(subj)+"&body="+encodeURIComponent(L.join("\n"));setTimeout(function(){fb.hidden=false;fb.scrollIntoView({block:"nearest"});},1200);});fb.querySelector("[data-copy]").addEventListener("click",function(){var b=this;var ok=function(){b.textContent="Copied";},no=function(){var ta=f.elements.msg;ta.value=msg;ta.select();b.textContent=document.execCommand&&document.execCommand("copy")?"Copied":"Select the text above and copy it";};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(msg).then(ok,no);else no();});var down=null;d.addEventListener("mousedown",function(e){down=e.target;});d.addEventListener("click",function(e){if(e.target===d&&down===d)d.close();});})();</script>
 <script>(function(){function fit(ul){var m=ul.querySelector("li.more");if(m)m.remove();var lis=[].slice.call(ul.querySelectorAll("li"));lis.forEach(function(l){l.hidden=false;});if(ul.dataset.open){var lm=document.createElement("li");lm.className="more";var lb=document.createElement("button");lb.type="button";lb.textContent="Show less";lb.setAttribute("aria-expanded","true");lb.onclick=function(){delete ul.dataset.open;fit(ul);var mb=ul.querySelector("li.more button");if(mb)mb.focus();};lm.appendChild(lb);ul.appendChild(lm);return;}
 var row1=function(el){return el.getBoundingClientRect().top-ul.getBoundingClientRect().top<12;};if(lis.every(row1))return;
 var more=document.createElement("li");more.className="more";var b=document.createElement("button");b.type="button";more.appendChild(b);ul.appendChild(more);
