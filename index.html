@@ -155,8 +155,8 @@ a.chip:hover { background: var(--accent); color: var(--on-accent); }
 
 /* stack + contact */
 .bottom { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px; }
-.stack { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
-.stack li { font-family: var(--mono); font-size: .84rem; padding: 6px 12px; border-radius: 999px; background: var(--bg); }
+.stack { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; align-items: center; align-self: start; }
+.stack li { font-family: var(--mono); font-size: .84rem; line-height: 1.2; padding: 8px 14px; border-radius: 999px; background: var(--bg); }
 .contact { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 .contact h2 { color: var(--on-accent); }
 .contact > header p { color: var(--on-accent); opacity: .85; }
