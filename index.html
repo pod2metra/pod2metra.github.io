@@ -198,6 +198,23 @@ a.chip:hover { background: var(--accent); color: var(--on-accent); }
 .loop { position: absolute; top: -32px; z-index: 2; left: calc((100% - 84px) / 4 + 46px); width: calc((100% - 84px) / 4 + 28px); height: 22px; border: 1.5px dashed var(--muted); border-bottom: 0; border-radius: 12px 12px 0 0; pointer-events: none; }
 .loop::before { content: ""; position: absolute; left: -5.75px; bottom: -9px; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 8px solid var(--muted); }
 .loop span { position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%); white-space: nowrap; font-family: var(--mono); font-size: .72rem; color: var(--muted); background: var(--surface); padding: 0 8px; }
+
+/* pipeline flow animation */
+.steps::before { background: linear-gradient(90deg, transparent, var(--accent), transparent) no-repeat, var(--line); background-size: 140px 100%, auto; background-position: -140px 0, 0 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .steps::before { animation: flow-x 4s linear infinite; }
+  .step .node { animation: node-ping 4s ease-out infinite; }
+  .step:nth-child(2) .node { animation-delay: 1s; }
+  .step:nth-child(3) .node { animation-delay: 2s; }
+  .step:nth-child(4) .node { animation-delay: 3s; }
+  .loop { animation: loop-glow 4s ease-in-out infinite; }
+  .loop::before { animation: loop-head 4s ease-in-out infinite; }
+}
+@keyframes flow-x { from { background-position: -140px 0, 0 0; } to { background-position: calc(100% + 140px) 0, 0 0; } }
+@keyframes flow-y { from { background-position: 0 -140px, 0 0; } to { background-position: 0 calc(100% + 140px), 0 0; } }
+@keyframes node-ping { 0% { box-shadow: 0 0 0 0 var(--accent-soft); } 12% { box-shadow: 0 0 0 7px var(--accent-soft); } 30%, 100% { box-shadow: 0 0 0 0 transparent; } }
+@keyframes loop-glow { 0%, 45%, 100% { border-color: var(--muted); } 60%, 75% { border-color: var(--accent); } }
+@keyframes loop-head { 0%, 45%, 100% { border-top-color: var(--muted); } 60%, 75% { border-top-color: var(--accent); } }
 .notes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin-top: 28px; }
 .note { display: grid; gap: 4px; padding: 16px 18px; border-radius: 12px; background: var(--bg); }
 .note strong { font-family: var(--mono); font-size: .82rem; font-weight: 500; }
@@ -268,6 +285,7 @@ a.chip:hover { background: var(--accent); color: var(--on-accent); }
   .step .node { grid-row: 1 / span 5; align-self: start; }
   .step .kind { margin-top: 8px; }
   .loop { display: none; }
+  .steps::before { background-image: linear-gradient(180deg, transparent, var(--accent), transparent); background-size: 100% 140px, auto; background-position: 0 -140px, 0 0; animation-name: flow-y; }
   .steps { margin-top: 0; }
 }
 @media (max-width: 560px) {
