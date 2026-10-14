@@ -57,10 +57,12 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="theme-color" content="#EEF0F4" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0B0D11" media="(prefers-color-scheme: dark)">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="preload" href="fonts/schibsted-grotesk.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/ibm-plex-sans.woff2" as="font" type="font/woff2" crossorigin>
 <style>
+@font-face { font-family: "Schibsted Grotesk"; font-style: normal; font-weight: 500 800; font-display: swap; src: url(fonts/schibsted-grotesk.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "IBM Plex Sans"; font-style: normal; font-weight: 400 600; font-display: swap; src: url(fonts/ibm-plex-sans.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 400 500; font-display: swap; src: url(fonts/jetbrains-mono.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 /* Layout: stacked full-width tiles (bento rows) on a tinted ground; dark hero tile, stepper for the pipeline, stacked bar for the team */
 :root {
   --bg: #EEF0F4;
@@ -72,6 +74,9 @@
   --accent-soft: #EBEEFC;
   --pass: #1C7A50;
   --pass-soft: #E2F3EA;
+  --fail: #C93A3A;
+  --idle: color-mix(in srgb, var(--muted) 45%, transparent);
+  --fail-soft: #FBE4E4;
   --on-accent: #FFFFFF;
   --seg1: #3347D1; --seg2: #7C8BE6; --seg3: #AEB8F0; --seg4: #CDD3F6; --seg5: #E3E7FA;
   --display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
@@ -82,7 +87,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #0B0D11; --surface: #14171E; --ink: #E9EBF0; --muted: #9AA2B1; --line: #252A34;
-    --accent: #9DADFF; --accent-soft: #1E2547; --pass: #66C99C; --pass-soft: #14302A;
+    --accent: #9DADFF; --accent-soft: #1E2547; --pass: #66C99C; --pass-soft: #14302A; --fail: #FF8A80; --fail-soft: #3A1B1D;
    
     --on-accent: #10142A;
     --seg1: #9DADFF; --seg2: #6F7FD6; --seg3: #4B58A3; --seg4: #353F75; --seg5: #262D52;
@@ -91,7 +96,7 @@
 }
 :root[data-theme="dark"] {
   --bg: #0B0D11; --surface: #14171E; --ink: #E9EBF0; --muted: #9AA2B1; --line: #252A34;
-  --accent: #9DADFF; --accent-soft: #1E2547; --pass: #66C99C; --pass-soft: #14302A;
+  --accent: #9DADFF; --accent-soft: #1E2547; --pass: #66C99C; --pass-soft: #14302A; --fail: #FF8A80; --fail-soft: #3A1B1D;
   --on-accent: #10142A;
   --seg1: #9DADFF; --seg2: #6F7FD6; --seg3: #4B58A3; --seg4: #353F75; --seg5: #262D52;
   color-scheme: dark;
@@ -181,40 +186,216 @@ a.chip:hover { background: var(--accent); color: var(--on-accent); }
 .metric span { color: var(--muted); font-size: .92rem; line-height: 1.4; }
 
 /* pipeline stepper */
-.steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 28px; position: relative; }
+.steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(6, auto); gap: 0 28px; position: relative; }
 .steps::before { content: ""; position: absolute; top: 17px; left: 18px; right: 18px; height: 2px; background: var(--line); }
-.step { display: grid; grid-template-rows: auto auto auto 1fr auto; gap: 10px; min-width: 0; position: relative; }
+.step { display: grid; grid-row: span 6; grid-template-rows: subgrid; gap: 10px; min-width: 0; position: relative; }
+.step .checks, .step .spec { align-self: start; }
 .node { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--surface); border: 2px solid var(--accent); color: var(--accent); font-family: var(--mono); font-size: .82rem; font-weight: 500; position: relative; z-index: 1; }
-.step.gate .node { border-color: var(--pass); color: var(--pass); background: var(--pass-soft); }
 .step .kind { font-family: var(--mono); font-size: .8rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
 .step h3 { font-size: 1.15rem; font-weight: 600; }
 .step p { color: var(--muted); font-size: .94rem; }
 .tag { font-family: var(--mono); font-size: .8rem; color: var(--accent); background: var(--accent-soft); padding: 5px 10px; border-radius: 999px; justify-self: start; align-self: end; }
 .step.gate .tag { color: var(--pass); background: var(--pass-soft); }
-.spec { display: flex; flex-wrap: wrap; gap: 6px; align-self: end; }
-.spec span { font-family: var(--mono); font-size: .8rem; padding: 3px 8px; border: 1px solid var(--line); border-radius: 6px; }
-.spec span.more { color: var(--muted); border-style: dashed; }
+.spec { display: flex; flex-wrap: wrap; align-content: flex-start; align-items: flex-start; gap: 6px 0; align-self: end; }
+.spec > span { font-family: var(--mono); font-size: .8rem; padding: 3px 8px; border: 1px solid var(--line); border-radius: 6px; position: relative; overflow: hidden; }
+.spec > span::after { content: ""; position: absolute; left: 0; bottom: 0; height: 3px; width: 100%; transform: scaleX(0); transform-origin: left; background: var(--accent); opacity: 0; }
+.spec > span.more { color: var(--muted); border-style: dashed; }
+.spec > span { white-space: nowrap; margin-right: 6px; display: inline-flex; align-items: center; gap: 5px; }
+.lg { width: 12px; height: 12px; flex: none; }
+.spec .mdl { display: grid; width: 12px; height: 12px; flex: none; }
+.spec .mdl .lg { grid-area: 1 / 1; opacity: 0; }
+.spec .mdl .lg.on { opacity: 1; }
+.spec > span.more { display: none; }
+.spec.measure > span { animation: none !important; display: inline-flex !important; }
+.spec { position: relative; }
+.spec::before { content: "no agents running"; display: none; position: absolute; left: 0; top: 4px; font-family: var(--mono); font-size: .8rem; color: var(--muted); opacity: 0; pointer-events: none; }
+.lg-claude { color: #D97757; }
+.lg-qwen { color: #615CED; }
+.lg-openai { color: currentColor; }
 .steps { margin-top: 56px; }
 .loop { position: absolute; top: -32px; z-index: 2; left: calc((100% - 84px) / 4 + 46px); width: calc((100% - 84px) / 4 + 28px); height: 22px; border: 1.5px dashed var(--muted); border-bottom: 0; border-radius: 12px 12px 0 0; pointer-events: none; }
 .loop::before { content: ""; position: absolute; left: -5.75px; bottom: -9px; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 8px solid var(--muted); }
 .loop span { position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%); white-space: nowrap; font-family: var(--mono); font-size: .72rem; color: var(--muted); background: var(--surface); padding: 0 8px; }
 
-/* pipeline flow animation */
-.steps::before { background: linear-gradient(90deg, transparent, var(--accent), transparent) no-repeat, var(--line); background-size: 140px 100%, auto; background-position: -140px 0, 0 0; }
+/* pipeline flow animation (the ball is the task), 24s cycle.
+   Pass 1: plan, build, checks (agent review fails), back to build.
+   Pass 2: rework, checks all green, release. A spinner marks the stage that is working. */
+.step.gate .node::before, .step.gate .node::after { position: absolute; top: -7px; right: -9px; width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 700; line-height: 1; color: #fff; opacity: 0; transform: scale(.4); z-index: 1; }
+.step.gate .node::before { content: "\2715"; background: var(--fail); }
+.step.gate .node::after { content: "\2713"; background: var(--pass); }
+.node .spin { position: absolute; inset: -6px; border-radius: 50%; border: 2px solid transparent; border-top-color: var(--accent); border-right-color: var(--accent); opacity: 0; }
+.checks { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 6px; align-self: end; }
+.checks li { font-family: var(--mono); font-size: .8rem; padding: 3px 8px 3px 7px; border: 1px solid var(--line); border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; }
+.checks li::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--pass); }
+.phases li::before, .ship li::before { background: var(--accent); }
+.task { position: absolute; inset: 0; pointer-events: none; opacity: 0; color: var(--accent); }
+.task::before { content: ""; position: absolute; left: -6px; top: -6px; width: 12px; height: 12px; border-radius: 50%; background: currentColor; box-shadow: 0 0 0 4px color-mix(in srgb, currentColor 22%, transparent); }
+.task::after { content: "rejected \2192  back to build"; display: none; position: absolute; left: 14px; top: -9px; white-space: nowrap; font-family: var(--mono); font-size: .72rem; line-height: 18px; color: var(--fail); background: var(--surface); padding: 0 6px; border-radius: 4px; opacity: 0; }
+.steps { contain: layout; }
+.status-row { display: none; align-items: center; justify-content: space-between; gap: 12px; }
+.anim-toggle { font: inherit; font-family: var(--mono); font-size: .75rem; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; width: 28px; height: 28px; padding: 0; display: grid; place-items: center; cursor: pointer; }
+.anim-toggle:hover { color: var(--accent); border-color: var(--accent); }
+.status { margin: 0; font-family: var(--mono); font-size: .8rem; color: var(--muted); }
+.status span { grid-area: 1 / 1; opacity: 0; }
+.status .fail { color: var(--fail); }
+.status .pass { color: var(--pass); }
+[data-anim=paused] *, [data-anim=paused] *::before, [data-anim=paused] *::after { animation-play-state: paused !important; }
 @media (prefers-reduced-motion: no-preference) {
-  .steps::before { animation: flow-x 4s linear infinite; }
-  .step .node { animation: node-ping 4s ease-out infinite; }
-  .step:nth-child(2) .node { animation-delay: 1s; }
-  .step:nth-child(3) .node { animation-delay: 2s; }
-  .step:nth-child(4) .node { animation-delay: 3s; }
-  .loop { animation: loop-glow 4s ease-in-out infinite; }
-  .loop::before { animation: loop-head 4s ease-in-out infinite; }
+  .task { animation: task 24s ease-in-out infinite; }
+  .spec > span.more { display: inline-flex; }
+  .spec::before { display: block; animation: idle-note 24s ease-in-out infinite; }
+  .status-row { display: flex; }
+  .status { display: grid; }
+  .status span:nth-child(1) { animation: st-1 24s linear infinite; }
+  .status span:nth-child(2) { animation: st-2 24s linear infinite; }
+  .status span:nth-child(3) { animation: st-3 24s linear infinite; }
+  .status span:nth-child(4) { animation: st-4 24s linear infinite; }
+  .status span:nth-child(5) { animation: st-5 24s linear infinite; }
+  .status span:nth-child(6) { animation: st-6 24s linear infinite; }
+  .status span:nth-child(7) { animation: st-7 24s linear infinite; }
+  .status span:nth-child(8) { animation: st-8 24s linear infinite; }
+  .step .node { animation: 24s ease-out infinite; }
+  .step:nth-child(1) .node { animation-name: ping-1; }
+  .step:nth-child(2) .node { animation-name: ping-2; }
+  .step:nth-child(3) .node { animation-name: ping-3; }
+  .step:nth-child(4) .node { animation-name: ping-4; }
+  .node .spin { animation: spin 1.4s linear infinite, 24s linear infinite; }
+  .step:nth-child(1) .spin { animation-name: spin, spin-1; }
+  .step:nth-child(2) .spin { animation-name: spin, spin-2; }
+  .step:nth-child(3) .spin { animation-name: spin, spin-3; }
+  .step:nth-child(4) .spin { animation-name: spin, spin-4; }
+  .step.gate .node::before { animation: badge-fail 24s ease-out infinite; }
+  .step.gate .node::after { animation: badge-pass 24s ease-out infinite; }
+  .checks li::before { animation: 24s step-end infinite; }
+  .checks li:nth-child(1)::before { animation-name: chk-1; }
+  .checks li:nth-child(2)::before { animation-name: chk-2; }
+  .checks li:nth-child(3)::before { animation-name: chk-3; }
+  .checks li:nth-child(4)::before { animation-name: chk-4; }
+  .checks li:nth-child(5)::before { animation-name: chk-5; }
+  .phases li:nth-child(1)::before { animation-name: phase-1; }
+  .phases li:nth-child(2)::before { animation-name: phase-2; }
+  .phases li:nth-child(3)::before { animation-name: phase-3; }
+  .ship li:nth-child(1)::before { animation-name: ship-1; }
+  .ship li:nth-child(2)::before { animation-name: ship-2; }
+  .ship li:nth-child(3)::before { animation-name: ship-3; }
+  .spec > span:nth-child(1) { animation: agent-1 24s ease-in-out infinite; }
+  .spec > span:nth-child(1)::after { animation: agent-bar-1 24s linear infinite; }
+  .spec > span:nth-child(1) .lg-claude { animation: mdl-1-claude 24s step-end infinite; }
+  .spec > span:nth-child(1) .lg-openai { animation: mdl-1-openai 24s step-end infinite; }
+  .spec > span:nth-child(1) .lg-qwen { animation: mdl-1-qwen 24s step-end infinite; }
+  .spec > span:nth-child(2) { animation: agent-2 24s ease-in-out infinite; }
+  .spec > span:nth-child(2)::after { animation: agent-bar-2 24s linear infinite; }
+  .spec > span:nth-child(2) .lg-claude { animation: mdl-2-claude 24s step-end infinite; }
+  .spec > span:nth-child(2) .lg-openai { animation: mdl-2-openai 24s step-end infinite; }
+  .spec > span:nth-child(2) .lg-qwen { animation: mdl-2-qwen 24s step-end infinite; }
+  .spec > span:nth-child(3) { animation: agent-3 24s ease-in-out infinite; }
+  .spec > span:nth-child(3)::after { animation: agent-bar-3 24s linear infinite; }
+  .spec > span:nth-child(3) .lg-claude { animation: mdl-3-claude 24s step-end infinite; }
+  .spec > span:nth-child(3) .lg-openai { animation: mdl-3-openai 24s step-end infinite; }
+  .spec > span:nth-child(3) .lg-qwen { animation: mdl-3-qwen 24s step-end infinite; }
+  .spec > span:nth-child(4) { animation: agent-4 24s ease-in-out infinite; }
+  .spec > span:nth-child(4)::after { animation: agent-bar-4 24s linear infinite; }
+  .spec > span:nth-child(4) .lg-claude { animation: mdl-4-claude 24s step-end infinite; }
+  .spec > span:nth-child(4) .lg-openai { animation: mdl-4-openai 24s step-end infinite; }
+  .spec > span:nth-child(4) .lg-qwen { animation: mdl-4-qwen 24s step-end infinite; }
+  .spec > span:nth-child(5) { animation: agent-5 24s ease-in-out infinite; }
+  .spec > span:nth-child(5)::after { animation: agent-bar-5 24s linear infinite; }
+  .spec > span:nth-child(5) .lg-claude { animation: mdl-5-claude 24s step-end infinite; }
+  .spec > span:nth-child(5) .lg-openai { animation: mdl-5-openai 24s step-end infinite; }
+  .spec > span:nth-child(5) .lg-qwen { animation: mdl-5-qwen 24s step-end infinite; }
+  .spec > span:nth-child(6) { animation: agent-6 24s ease-in-out infinite; }
+  .spec > span:nth-child(6)::after { animation: agent-bar-6 24s linear infinite; }
+  .spec > span:nth-child(6) .lg-claude { animation: mdl-6-claude 24s step-end infinite; }
+  .spec > span:nth-child(6) .lg-openai { animation: mdl-6-openai 24s step-end infinite; }
+  .spec > span:nth-child(6) .lg-qwen { animation: mdl-6-qwen 24s step-end infinite; }
+  .spec > span:nth-child(7) { animation: agent-7 24s ease-in-out infinite; }
+  .spec > span:nth-child(7)::after { animation: agent-bar-7 24s linear infinite; }
+  .spec > span:nth-child(7) .lg-claude { animation: mdl-7-claude 24s step-end infinite; }
+  .spec > span:nth-child(7) .lg-openai { animation: mdl-7-openai 24s step-end infinite; }
+  .spec > span:nth-child(7) .lg-qwen { animation: mdl-7-qwen 24s step-end infinite; }
+  .spec > span:nth-child(1) { order: 1; }
+  .spec > span:nth-child(2) { order: 3; }
+  .spec > span:nth-child(3) { order: 4; }
+  .spec > span:nth-child(4) { order: 2; }
+  .spec > span:nth-child(5) { order: 5; }
+  .spec > span:nth-child(6) { order: 7; }
+  .spec > span:nth-child(7) { order: 6; }
+  .loop { animation: loop-red 24s ease-in-out infinite; }
+  .loop::before { animation: loop-head 24s ease-in-out infinite; }
+  .loop span { animation: loop-text 24s ease-in-out infinite; }
 }
-@keyframes flow-x { from { background-position: -140px 0, 0 0; } to { background-position: calc(100% + 140px) 0, 0 0; } }
-@keyframes flow-y { from { background-position: 0 -140px, 0 0; } to { background-position: 0 calc(100% + 140px), 0 0; } }
-@keyframes node-ping { 0% { box-shadow: 0 0 0 0 var(--accent-soft); } 12% { box-shadow: 0 0 0 7px var(--accent-soft); } 30%, 100% { box-shadow: 0 0 0 0 transparent; } }
-@keyframes loop-glow { 0%, 45%, 100% { border-color: var(--muted); } 60%, 75% { border-color: var(--accent); } }
-@keyframes loop-head { 0%, 45%, 100% { border-top-color: var(--muted); } 60%, 75% { border-top-color: var(--accent); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes idle-note { 0%, 13.6%, 27.6%, 49.4%, 65.6%, 100% { opacity: .8; } 14.5%, 26.7%, 49.8%, 64.8% { opacity: 0; } }
+@keyframes task-label { 0%, 44%, 50.875%, 100% { opacity: 0; } 44.5%, 49.75% { opacity: 1; } }
+@keyframes st-1 { 0%, 12.1% { opacity: 1; } 12.9%, 100% { opacity: 0; } }
+@keyframes st-2 { 0%, 12.1%, 29.9%, 100% { opacity: 0; } 12.9%, 29.1% { opacity: 1; } }
+@keyframes st-3 { 0%, 29.1%, 44.2%, 100% { opacity: 0; } 29.9%, 43.6% { opacity: 1; } }
+@keyframes st-4 { 0%, 43.6%, 50.7%, 100% { opacity: 0; } 44.2%, 49.8% { opacity: 1; } }
+@keyframes st-5 { 0%, 49.8%, 65.4%, 100% { opacity: 0; } 50.7%, 64.6% { opacity: 1; } }
+@keyframes st-6 { 0%, 64.6%, 82.4%, 100% { opacity: 0; } 65.4%, 81.6% { opacity: 1; } }
+@keyframes st-7 { 0%, 81.6%, 88.4%, 100% { opacity: 0; } 82.4%, 87.6% { opacity: 1; } }
+@keyframes st-8 { 0%, 87.6% { opacity: 0; } 88.4%, 99% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes agent-1 { 0%, 100% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } 14.6% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } 15.5%, 24% { border-color: var(--line); background: transparent; color: inherit; opacity: 1; transform: none; max-width: 12em; padding-left: 8px; padding-right: 8px; border-width: 1px; margin-right: 6px; } 25.3% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } 49.8% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } 50.875%, 62.25% { border-color: var(--line); background: transparent; color: inherit; opacity: 1; transform: none; max-width: 12em; padding-left: 8px; padding-right: 8px; border-width: 1px; margin-right: 6px; } 64.3% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } }
+@keyframes agent-bar-1 { 0%, 100% { transform: scaleX(0); opacity: 0; } 15.4% { transform: scaleX(0); opacity: 0; } 15.5% { transform: scaleX(0); opacity: 1; } 24% { transform: scaleX(1); opacity: 1; } 25.3% { transform: scaleX(1); opacity: 0; } 50.7% { transform: scaleX(0); opacity: 0; } 50.875% { transform: scaleX(0); opacity: 1; } 62.25% { transform: scaleX(1); opacity: 1; } 64.3% { transform: scaleX(1); opacity: 0; } }
+@keyframes mdl-1-claude { 0% { opacity: 1; } 50.35% { opacity: 0; } }
+@keyframes mdl-1-openai { 0% { opacity: 0; } 50.35% { opacity: 1; } }
+@keyframes mdl-1-qwen { 0% { opacity: 0; } 50.35% { opacity: 0; } }
+@keyframes agent-2 { 0%, 100% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } 15.6% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } 16.5%, 20.6% { border-color: var(--line); background: transparent; color: inherit; opacity: 1; transform: none; max-width: 12em; padding-left: 8px; padding-right: 8px; border-width: 1px; margin-right: 6px; } 21.9% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } 22% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } 22.9%, 25.4% { border-color: var(--line); background: transparent; color: inherit; opacity: 1; transform: none; max-width: 12em; padding-left: 8px; padding-right: 8px; border-width: 1px; margin-right: 6px; } 26.7% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } }
+@keyframes agent-bar-2 { 0%, 100% { transform: scaleX(0); opacity: 0; } 16.4% { transform: scaleX(0); opacity: 0; } 16.5% { transform: scaleX(0); opacity: 1; } 20.6% { transform: scaleX(1); opacity: 1; } 21.9% { transform: scaleX(1); opacity: 0; } 22.8% { transform: scaleX(0); opacity: 0; } 22.9% { transform: scaleX(0); opacity: 1; } 25.4% { transform: scaleX(1); opacity: 1; } 26.7% { transform: scaleX(1); opacity: 0; } }
+@keyframes mdl-2-claude { 0% { opacity: 1; } 22.4% { opacity: 0; } }
+@keyframes mdl-2-openai { 0% { opacity: 0; } 22.4% { opacity: 0; } }
+@keyframes mdl-2-qwen { 0% { opacity: 0; } 22.4% { opacity: 1; } }
+@keyframes agent-3 { 0%, 100% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } 16.6% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } 17.5%, 24.5% { border-color: var(--line); background: transparent; color: inherit; opacity: 1; transform: none; max-width: 12em; padding-left: 8px; padding-right: 8px; border-width: 1px; margin-right: 6px; } 25.8% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } 51.05% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } 52.625%, 63.125% { border-color: var(--line); background: transparent; color: inherit; opacity: 1; transform: none; max-width: 12em; padding-left: 8px; padding-right: 8px; border-width: 1px; margin-right: 6px; } 64.8% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } }
+@keyframes agent-bar-3 { 0%, 100% { transform: scaleX(0); opacity: 0; } 17.4% { transform: scaleX(0); opacity: 0; } 17.5% { transform: scaleX(0); opacity: 1; } 24.5% { transform: scaleX(1); opacity: 1; } 25.8% { transform: scaleX(1); opacity: 0; } 52.45% { transform: scaleX(0); opacity: 0; } 52.625% { transform: scaleX(0); opacity: 1; } 63.125% { transform: scaleX(1); opacity: 1; } 64.8% { transform: scaleX(1); opacity: 0; } }
+@keyframes mdl-3-claude { 0% { opacity: 0; } 52.1% { opacity: 1; } }
+@keyframes mdl-3-openai { 0% { opacity: 1; } 52.1% { opacity: 0; } }
+@keyframes mdl-3-qwen { 0% { opacity: 0; } 52.1% { opacity: 0; } }
+@keyframes agent-4 { 0%, 100% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } 15.1% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } 16%, 19.6% { border-color: var(--line); background: transparent; color: inherit; opacity: 1; transform: none; max-width: 12em; padding-left: 8px; padding-right: 8px; border-width: 1px; margin-right: 6px; } 20.9% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } 21% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } 21.9%, 24.4% { border-color: var(--line); background: transparent; color: inherit; opacity: 1; transform: none; max-width: 12em; padding-left: 8px; padding-right: 8px; border-width: 1px; margin-right: 6px; } 25.7% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } }
+@keyframes agent-bar-4 { 0%, 100% { transform: scaleX(0); opacity: 0; } 15.9% { transform: scaleX(0); opacity: 0; } 16% { transform: scaleX(0); opacity: 1; } 19.6% { transform: scaleX(1); opacity: 1; } 20.9% { transform: scaleX(1); opacity: 0; } 21.8% { transform: scaleX(0); opacity: 0; } 21.9% { transform: scaleX(0); opacity: 1; } 24.4% { transform: scaleX(1); opacity: 1; } 25.7% { transform: scaleX(1); opacity: 0; } }
+@keyframes mdl-4-claude { 0% { opacity: 0; } 21.4% { opacity: 0; } }
+@keyframes mdl-4-openai { 0% { opacity: 0; } 21.4% { opacity: 1; } }
+@keyframes mdl-4-qwen { 0% { opacity: 1; } 21.4% { opacity: 0; } }
+@keyframes agent-5 { 0%, 100% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } 17.1% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } 18%, 24.5% { border-color: var(--line); background: transparent; color: inherit; opacity: 1; transform: none; max-width: 12em; padding-left: 8px; padding-right: 8px; border-width: 1px; margin-right: 6px; } 25.8% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } 51.925% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } 53.5%, 63.125% { border-color: var(--line); background: transparent; color: inherit; opacity: 1; transform: none; max-width: 12em; padding-left: 8px; padding-right: 8px; border-width: 1px; margin-right: 6px; } 64.8% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } }
+@keyframes agent-bar-5 { 0%, 100% { transform: scaleX(0); opacity: 0; } 17.9% { transform: scaleX(0); opacity: 0; } 18% { transform: scaleX(0); opacity: 1; } 24.5% { transform: scaleX(1); opacity: 1; } 25.8% { transform: scaleX(1); opacity: 0; } 53.325% { transform: scaleX(0); opacity: 0; } 53.5% { transform: scaleX(0); opacity: 1; } 63.125% { transform: scaleX(1); opacity: 1; } 64.8% { transform: scaleX(1); opacity: 0; } }
+@keyframes mdl-5-claude { 0% { opacity: 0; } 52.975% { opacity: 1; } }
+@keyframes mdl-5-openai { 0% { opacity: 0; } 52.975% { opacity: 0; } }
+@keyframes mdl-5-qwen { 0% { opacity: 1; } 52.975% { opacity: 0; } }
+@keyframes agent-6 { 0%, 100% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } 19.1% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } 20%, 24.5% { border-color: var(--line); background: transparent; color: inherit; opacity: 1; transform: none; max-width: 12em; padding-left: 8px; padding-right: 8px; border-width: 1px; margin-right: 6px; } 25.8% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } }
+@keyframes agent-bar-6 { 0%, 100% { transform: scaleX(0); opacity: 0; } 19.9% { transform: scaleX(0); opacity: 0; } 20% { transform: scaleX(0); opacity: 1; } 24.5% { transform: scaleX(1); opacity: 1; } 25.8% { transform: scaleX(1); opacity: 0; } }
+@keyframes mdl-6-claude { 0% { opacity: 0; } }
+@keyframes mdl-6-openai { 0% { opacity: 0; } }
+@keyframes mdl-6-qwen { 0% { opacity: 1; } }
+@keyframes agent-7 { 0%, 100% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } 18.6% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } 19.5%, 24.5% { border-color: var(--line); background: transparent; color: inherit; opacity: 1; transform: none; max-width: 12em; padding-left: 8px; padding-right: 8px; border-width: 1px; margin-right: 6px; } 25.8% { border-color: var(--line); background: transparent; color: inherit; opacity: 0; transform: scale(.8); max-width: 0; padding-left: 0; padding-right: 0; border-width: 0; margin-right: 0; } }
+@keyframes agent-bar-7 { 0%, 100% { transform: scaleX(0); opacity: 0; } 19.4% { transform: scaleX(0); opacity: 0; } 19.5% { transform: scaleX(0); opacity: 1; } 24.5% { transform: scaleX(1); opacity: 1; } 25.8% { transform: scaleX(1); opacity: 0; } }
+@keyframes mdl-7-claude { 0% { opacity: 0; } }
+@keyframes mdl-7-openai { 0% { opacity: 1; } }
+@keyframes mdl-7-qwen { 0% { opacity: 0; } }
+@keyframes ship-1 { 0% { background: var(--idle); } 89.5% { background: var(--accent); } }
+@keyframes ship-2 { 0% { background: var(--idle); } 92% { background: var(--accent); } }
+@keyframes ship-3 { 0% { background: var(--idle); } 94.5% { background: var(--accent); } }
+@keyframes task-m { 0% { transform: translate(18px, var(--y0, 18px)); opacity: 0; z-index: 0; color: var(--accent); } 2%, 10% { transform: translate(18px, var(--y0, 18px)); opacity: 1; } 15%, 25% { transform: translate(18px, var(--y1, 18px)); } 30%, 43.9% { transform: translate(18px, var(--y2, 18px)); z-index: 0; color: var(--accent); } 44% { transform: translate(18px, var(--y2, 18px)); z-index: 3; color: var(--fail); } 49.95% { transform: translate(18px, var(--y1, 18px)); z-index: 3; color: var(--fail); } 50%, 64% { transform: translate(18px, var(--y1, 18px)); z-index: 0; color: var(--accent); } 68%, 82% { transform: translate(18px, var(--y2, 18px)); } 88%, 96% { transform: translate(18px, var(--y3, 18px)); opacity: 1; } 99%, 100% { transform: translate(18px, var(--y3, 18px)); opacity: 0; } }
+@keyframes phase-1 { 0% { background: var(--idle); } 3.5% { background: var(--accent); } }
+@keyframes phase-2 { 0% { background: var(--idle); } 6% { background: var(--accent); } }
+@keyframes phase-3 { 0% { background: var(--idle); } 8.5% { background: var(--accent); } }
+@keyframes spin-1 { 0%, 1.9%, 10.1%, 100% { opacity: 0; } 2%, 10% { opacity: 1; } }
+@keyframes spin-2 { 0%, 14.9%, 25.1%, 49.95%, 64.1%, 100% { opacity: 0; } 15%, 25% { opacity: 1; } 50%, 64% { opacity: 1; } }
+@keyframes spin-3 { 0%, 29.9%, 44.05%, 67.9%, 82.1%, 100% { opacity: 0; } 30%, 44% { opacity: 1; } 68%, 82% { opacity: 1; } }
+@keyframes spin-4 { 0%, 87.9%, 96.1%, 100% { opacity: 0; } 88%, 96% { opacity: 1; } }
+@keyframes ping-1 { 0%, 100% { box-shadow: 0 0 0 0 transparent; } 1% { box-shadow: 0 0 0 0 var(--accent-soft); } 3% { box-shadow: 0 0 0 7px var(--accent-soft); } 7% { box-shadow: 0 0 0 0 transparent; } }
+@keyframes ping-2 { 0%, 100% { box-shadow: 0 0 0 0 transparent; } 14% { box-shadow: 0 0 0 0 var(--accent-soft); } 16% { box-shadow: 0 0 0 7px var(--accent-soft); } 20% { box-shadow: 0 0 0 0 transparent; } 49.5% { box-shadow: 0 0 0 0 var(--fail-soft); } 51.75% { box-shadow: 0 0 0 7px var(--fail-soft); } 58.75% { box-shadow: 0 0 0 0 transparent; } }
+@keyframes ping-4 { 0%, 100% { box-shadow: 0 0 0 0 transparent; } 87% { box-shadow: 0 0 0 0 var(--accent-soft); } 89% { box-shadow: 0 0 0 7px var(--accent-soft); } 93% { box-shadow: 0 0 0 0 transparent; } }
+@keyframes ping-3 { 0%, 29% { box-shadow: 0 0 0 0 transparent; border-color: var(--accent); color: var(--accent); background: var(--surface); } 31% { box-shadow: 0 0 0 7px var(--accent-soft); } 35%, 43.9% { box-shadow: 0 0 0 0 transparent; border-color: var(--accent); color: var(--accent); background: var(--surface); } 44.25%, 49% { box-shadow: 0 0 0 7px var(--fail-soft); border-color: var(--fail); color: var(--fail); background: var(--fail-soft); } 51.75%, 81.9% { box-shadow: 0 0 0 0 transparent; border-color: var(--accent); color: var(--accent); background: var(--surface); } 82.5%, 94% { box-shadow: 0 0 0 7px var(--pass-soft); border-color: var(--pass); color: var(--pass); background: var(--pass-soft); } 98%, 100% { box-shadow: 0 0 0 0 transparent; border-color: var(--accent); color: var(--accent); background: var(--surface); } }
+@keyframes badge-fail { 0%, 43.9% { opacity: 0; transform: scale(.4); } 44.5%, 49% { opacity: 1; transform: scale(1); } 51.75%, 100% { opacity: 0; transform: scale(.4); } }
+@keyframes badge-pass { 0%, 81.9% { opacity: 0; transform: scale(.4); } 83%, 95% { opacity: 1; transform: scale(1); } 98%, 100% { opacity: 0; transform: scale(.4); } }
+@keyframes chk-1 { 0% { background: var(--idle); } 34% { background: var(--pass); } 50% { background: var(--idle); } 70.5% { background: var(--pass); } }
+@keyframes chk-2 { 0% { background: var(--idle); } 39% { background: var(--fail); } 50% { background: var(--idle); } 73% { background: var(--pass); } }
+@keyframes chk-3 { 0% { background: var(--idle); } 75.5% { background: var(--pass); } }
+@keyframes chk-4 { 0% { background: var(--idle); } 78% { background: var(--pass); } }
+@keyframes chk-5 { 0% { background: var(--idle); } 80.5% { background: var(--pass); } }
+@keyframes loop-red { 0%, 43%, 51.75%, 100% { border-color: var(--muted); } 44.5%, 49.5% { border-color: var(--fail); } }
+@keyframes loop-head { 0%, 43%, 51.75%, 100% { border-top-color: var(--muted); } 44.5%, 49.5% { border-top-color: var(--fail); } }
+@keyframes loop-text { 0%, 43%, 51.75%, 100% { color: var(--muted); } 44.5%, 49.5% { color: var(--fail); } }
+@keyframes task { 0% { transform: translate(18px, 18px); opacity: 0; z-index: 0; color: var(--accent); } 2%, 10% { transform: translate(18px, 18px); opacity: 1; } 15%, 25% { transform: translate(calc(18px + 1 * ((100% - 84px) / 4 + 28px)), 18px); } 30%, 43.9% { transform: translate(calc(18px + 2 * ((100% - 84px) / 4 + 28px)), 18px); z-index: 0; color: var(--accent); } 44% { transform: translate(calc(18px + 2 * ((100% - 84px) / 4 + 28px)), 18px); z-index: 3; color: var(--fail); } 45.5% { transform: translate(calc(18px + 2 * ((100% - 84px) / 4 + 28px)), -32px); } 48.5% { transform: translate(calc(18px + 1 * ((100% - 84px) / 4 + 28px)), -32px); } 49.95% { transform: translate(calc(18px + 1 * ((100% - 84px) / 4 + 28px)), 18px); z-index: 3; color: var(--fail); } 50%, 64% { transform: translate(calc(18px + 1 * ((100% - 84px) / 4 + 28px)), 18px); z-index: 0; color: var(--accent); } 68%, 82% { transform: translate(calc(18px + 2 * ((100% - 84px) / 4 + 28px)), 18px); } 88%, 96% { transform: translate(calc(18px + 3 * ((100% - 84px) / 4 + 28px)), 18px); opacity: 1; } 99%, 100% { transform: translate(calc(18px + 3 * ((100% - 84px) / 4 + 28px)), 18px); opacity: 0; } }
 .notes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin-top: 28px; }
 .note { display: grid; gap: 4px; padding: 16px 18px; border-radius: 12px; background: var(--bg); }
 .note strong { font-family: var(--mono); font-size: .82rem; font-weight: 500; }
@@ -278,14 +459,17 @@ a.chip:hover { background: var(--accent); color: var(--on-accent); }
 @media (max-width: 860px) {
   .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .split, .bottom, .notes, .tile > header.split-head { grid-template-columns: minmax(0, 1fr); }
-  .steps { grid-template-columns: minmax(0, 1fr); gap: 26px; }
+  .steps { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; gap: 26px; }
   .steps::before { top: 18px; bottom: 18px; left: 17px; right: auto; width: 2px; height: auto; }
-  .step { grid-template-columns: 36px minmax(0, 1fr); grid-template-rows: none; column-gap: 16px; row-gap: 8px; }
+  .step { grid-row: auto; grid-template-columns: 36px minmax(0, 1fr); grid-template-rows: none; column-gap: 16px; row-gap: 8px; }
   .step > :not(.node) { grid-column: 2; }
   .step .node { grid-row: 1 / span 5; align-self: start; }
   .step .kind { margin-top: 8px; }
   .loop { display: none; }
-  .steps::before { background-image: linear-gradient(180deg, transparent, var(--accent), transparent); background-size: 100% 140px, auto; background-position: 0 -140px, 0 0; animation-name: flow-y; }
+  .steps::before { background-image: linear-gradient(180deg, transparent, var(--accent), transparent); background-size: 100% 140px, auto; background-position: 0 -140px, 0 0; }
+  .task { animation-name: task-m; }
+  .task::after { display: block; left: -30px; top: 0; padding: 0; background: none; writing-mode: vertical-rl; transform: translateY(-50%) rotate(180deg); animation: task-label 24s linear infinite; }
+  .status-row { margin-bottom: 18px; }
   .steps { margin-top: 0; }
 }
 @media (max-width: 560px) {
@@ -347,35 +531,41 @@ a.chip:hover { background: var(--accent); color: var(--on-accent); }
       </div>
     </header>
     <div>
+      <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="lg-claude" viewBox="0 0 24 24" fill="currentColor"><path d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"/></symbol><symbol id="lg-qwen" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M12.604 1.34c.393.69.784 1.382 1.174 2.075a.18.18 0 00.157.091h5.552c.174 0 .322.11.446.327l1.454 2.57c.19.337.24.478.024.837-.26.43-.513.864-.76 1.3l-.367.658c-.106.196-.223.28-.04.512l2.652 4.637c.172.301.111.494-.043.77-.437.785-.882 1.564-1.335 2.34-.159.272-.352.375-.68.37-.777-.016-1.552-.01-2.327.016a.099.099 0 00-.081.05 575.097 575.097 0 01-2.705 4.74c-.169.293-.38.363-.725.364-.997.003-2.002.004-3.017.002a.537.537 0 01-.465-.271l-1.335-2.323a.09.09 0 00-.083-.049H4.982c-.285.03-.553-.001-.805-.092l-1.603-2.77a.543.543 0 01-.002-.54l1.207-2.12a.198.198 0 000-.197 550.951 550.951 0 01-1.875-3.272l-.79-1.395c-.16-.31-.173-.496.095-.965.465-.813.927-1.625 1.387-2.436.132-.234.304-.334.584-.335a338.3 338.3 0 012.589-.001.124.124 0 00.107-.063l2.806-4.895a.488.488 0 01.422-.246c.524-.001 1.053 0 1.583-.006L11.704 1c.341-.003.724.032.9.34zm-3.432.403a.06.06 0 00-.052.03L6.254 6.788a.157.157 0 01-.135.078H3.253c-.056 0-.07.025-.041.074l5.81 10.156c.025.042.013.062-.034.063l-2.795.015a.218.218 0 00-.2.116l-1.32 2.31c-.044.078-.021.118.068.118l5.716.008c.046 0 .08.02.104.061l1.403 2.454c.046.081.092.082.139 0l5.006-8.76.783-1.382a.055.055 0 01.096 0l1.424 2.53a.122.122 0 00.107.062l2.763-.02a.04.04 0 00.035-.02.041.041 0 000-.04l-2.9-5.086a.108.108 0 010-.113l.293-.507 1.12-1.977c.024-.041.012-.062-.035-.062H9.2c-.059 0-.073-.026-.043-.077l1.434-2.505a.107.107 0 000-.114L9.225 1.774a.06.06 0 00-.053-.031zm6.29 8.02c.046 0 .058.02.034.06l-.832 1.465-2.613 4.585a.056.056 0 01-.05.029.058.058 0 01-.05-.029L8.498 9.841c-.02-.034-.01-.052.028-.054l.216-.012 6.722-.012z"/></symbol><symbol id="lg-openai" viewBox="0 0 24 24" fill="currentColor"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z"/></symbol></svg>
+      <div class="status-row"><p class="status" aria-hidden="true"><span>Planning: architecture, plan, tasks</span><span>Agents build in parallel</span><span>Checks: memory, agent review, tests</span><span class="fail">Agent review failed: back to build</span><span>Agents rework the change</span><span>Checks run again</span><span class="pass">All checks green</span><span>Engineers review and test, then release</span></p><button type="button" class="anim-toggle" aria-pressed="false" aria-label="Pause animation" title="Pause"><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><rect x="3" y="2" width="3.5" height="12" rx="1" fill="currentColor"/><rect x="9.5" y="2" width="3.5" height="12" rx="1" fill="currentColor"/></svg></button></div>
       <div class="steps">
         <article class="step">
-          <span class="node">01</span>
+          <span class="node">01<span class="spin" aria-hidden="true"></span></span>
           <span class="kind">Plan</span>
           <h3>Architecture and plan</h3>
           <p>I set the architecture. A team-lead agent plans the work with me and splits it into tasks.</p>
+          <ul class="checks phases" aria-label="Planning steps"><li>architecture</li><li>plan</li><li>tasks</li></ul>
           <span class="tag">me + lead agent</span>
         </article>
         <article class="step">
-          <span class="node">02</span>
+          <span class="node">02<span class="spin" aria-hidden="true"></span></span>
           <span class="kind">Build</span>
           <h3>Coding agents</h3>
-          <p>Six domain specialists, scaled out on demand when work piles up.</p>
-          <div class="spec" aria-label="Specialists"><span>backend</span><span>data</span><span>integrations</span><span>frontend</span><span class="more">+2</span></div>
+          <p>Specialist agents for each domain. Each task goes to a model that fits its complexity and cost: Claude, Codex or a local Qwen. Scaled out on demand when work piles up.</p>
+          <div class="spec" aria-label="Specialist agents"><span title="backend: Claude / Codex"><span class="mdl" aria-hidden="true"><svg class="lg lg-claude on"><use href="#lg-claude"/></svg><svg class="lg lg-openai"><use href="#lg-openai"/></svg><svg class="lg lg-qwen"><use href="#lg-qwen"/></svg></span>backend</span><span title="data: Claude / Qwen (local)"><span class="mdl" aria-hidden="true"><svg class="lg lg-claude on"><use href="#lg-claude"/></svg><svg class="lg lg-openai"><use href="#lg-openai"/></svg><svg class="lg lg-qwen"><use href="#lg-qwen"/></svg></span>data</span><span title="integrations: Codex / Claude"><span class="mdl" aria-hidden="true"><svg class="lg lg-claude"><use href="#lg-claude"/></svg><svg class="lg lg-openai on"><use href="#lg-openai"/></svg><svg class="lg lg-qwen"><use href="#lg-qwen"/></svg></span>integrations</span><span title="frontend: Qwen (local) / Codex"><span class="mdl" aria-hidden="true"><svg class="lg lg-claude"><use href="#lg-claude"/></svg><svg class="lg lg-openai"><use href="#lg-openai"/></svg><svg class="lg lg-qwen on"><use href="#lg-qwen"/></svg></span>frontend</span><span title="tests: Qwen (local) / Claude"><span class="mdl" aria-hidden="true"><svg class="lg lg-claude"><use href="#lg-claude"/></svg><svg class="lg lg-openai"><use href="#lg-openai"/></svg><svg class="lg lg-qwen on"><use href="#lg-qwen"/></svg></span>tests</span><span title="docs: Qwen (local)"><span class="mdl" aria-hidden="true"><svg class="lg lg-claude"><use href="#lg-claude"/></svg><svg class="lg lg-openai"><use href="#lg-openai"/></svg><svg class="lg lg-qwen on"><use href="#lg-qwen"/></svg></span>docs</span><span class="more" title="backend: Codex"><span class="mdl" aria-hidden="true"><svg class="lg lg-claude"><use href="#lg-claude"/></svg><svg class="lg lg-openai on"><use href="#lg-openai"/></svg><svg class="lg lg-qwen"><use href="#lg-qwen"/></svg></span>backend</span></div>
         </article>
         <article class="step gate">
-          <span class="node">03</span>
+          <span class="node">03<span class="spin" aria-hidden="true"></span></span>
           <span class="kind">Check</span>
           <h3>Review and test</h3>
-          <p>Separate reviewer and tester agents check every change against integration, end-to-end and infrastructure tests. Rejected work goes back to the coding agents.</p>
+          <p>Reviewer agents check every change against project memory, then integration, end-to-end and infrastructure tests run. Rejected work goes back to the coding agents.</p>
+          <ul class="checks" aria-label="Checks"><li>memory</li><li>agent review</li><li>integration</li><li>e2e</li><li>infra</li></ul>
           <span class="tag">100% integration coverage</span>
         </article>
         <article class="step">
-          <span class="node">04</span>
+          <span class="node">04<span class="spin" aria-hidden="true"></span></span>
           <span class="kind">Ship</span>
-          <h3>Release</h3>
-          <p>Approved changes go to production, including custom features for individual clients.</p>
+          <h3>Human review</h3>
+          <p>Approved changes go to engineers for review and testing, then to production. Agents take most of the routine; people make the final call.</p>
+          <ul class="checks ship" aria-label="Release steps"><li>human review</li><li>human testing</li><li>release</li></ul>
           <span class="tag">custom client features</span>
         </article>
+        <span class="task" aria-hidden="true"></span>
         <div class="loop" aria-hidden="true"><span>rejected → back to build</span></div>
       </div>
     </div>
@@ -520,5 +710,57 @@ function all(){document.querySelectorAll(".stack-groups .stack").forEach(fit);}
 var t;window.addEventListener("resize",function(){clearTimeout(t);t=setTimeout(all,120);});
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(all);all();})();</script>
 <script>document.querySelectorAll("a.mail").forEach(function(a){var e=a.dataset.u+"@"+a.dataset.d;a.href="mailto:"+e+(a.dataset.s?"?subject="+encodeURIComponent(a.dataset.s):"");var t=a.querySelector("[data-t]");if(t)t.textContent=e;});</script>
+<script>
+// mobile pipeline: the ball needs each node's vertical centre, which depends on text height
+(function () {
+  var steps = document.querySelector('.steps');
+  if (!steps) return;
+  function place() {
+    var top = steps.getBoundingClientRect().top;
+    steps.querySelectorAll('.step .node').forEach(function (n, i) {
+      var r = n.getBoundingClientRect();
+      steps.style.setProperty('--y' + i, (r.top - top + r.height / 2) + 'px');
+    });
+  }
+  var t;
+  window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(place, 150); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
+  document.addEventListener('pipeline-layout', place);
+  place();
+})();
+</script>
+<script>
+// pipeline animation: start from the first stage when the block scrolls into view, pause it off-screen or on request
+(function () {
+  var box = document.querySelector('.steps'), btn = document.querySelector('.anim-toggle');
+  if (!box || !('IntersectionObserver' in window)) return;
+  var root = box.closest('section') || box.parentNode, seen = false, held = false;
+  function apply() { root.setAttribute('data-anim', seen && !held ? 'run' : 'paused'); }
+  // agents come and go; reserve the height of the full list so the stage does not jump
+  var spec = box.querySelector('.spec');
+  function reserve() {
+    if (!spec) return;
+    spec.style.minHeight = '';
+    spec.classList.add('measure');
+    var h = spec.getBoundingClientRect().height;
+    spec.classList.remove('measure');
+    spec.style.minHeight = h + 'px';
+    document.dispatchEvent(new Event('pipeline-layout'));
+  }
+  var rt;
+  window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(reserve, 150); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(reserve);
+  reserve();
+  apply();
+  new IntersectionObserver(function (es) { seen = es[0].isIntersecting; apply(); }, { threshold: 0.25 }).observe(box);
+  if (btn) btn.addEventListener('click', function () {
+    held = !held; apply();
+    btn.setAttribute('aria-pressed', String(held));
+    btn.innerHTML = held ? '<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M4 2.5v11a1 1 0 0 0 1.5.86l9-5.5a1 1 0 0 0 0-1.72l-9-5.5A1 1 0 0 0 4 2.5z" fill="currentColor"/></svg>' : '<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><rect x="3" y="2" width="3.5" height="12" rx="1" fill="currentColor"/><rect x="9.5" y="2" width="3.5" height="12" rx="1" fill="currentColor"/></svg>';
+    btn.setAttribute('aria-label', held ? 'Play animation' : 'Pause animation');
+    btn.title = held ? 'Play' : 'Pause';
+  });
+})();
+</script>
 </body>
 </html>
