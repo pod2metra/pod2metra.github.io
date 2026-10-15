@@ -60,6 +60,7 @@
 <meta name="theme-color" content="#0B0D11" media="(prefers-color-scheme: dark)">
 <link rel="preload" href="fonts/schibsted-grotesk.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/ibm-plex-sans.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
 <style>
 @font-face { font-family: "Schibsted Grotesk"; font-style: normal; font-weight: 500 800; font-display: swap; src: url(fonts/schibsted-grotesk.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 @font-face { font-family: "IBM Plex Sans"; font-style: normal; font-weight: 400 600; font-display: swap; src: url(fonts/ibm-plex-sans.woff2) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
@@ -216,7 +217,7 @@ a.chip:hover { background: var(--accent); color: var(--on-accent); }
 .steps::before { content: ""; position: absolute; top: 17px; left: 18px; right: calc((100% - 84px) / 4 - 18px); height: 2px; background: var(--line); }
 .step { display: grid; grid-row: span 6; grid-template-rows: subgrid; gap: 10px; min-width: 0; position: relative; }
 .step .checks, .step .spec { align-self: start; }
-.node { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--surface); border: 2px solid var(--accent); color: var(--accent); font-family: var(--mono); font-size: min(.82rem, 14px); font-weight: 500; position: relative; z-index: 1; }
+.node { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--surface); border: 2px solid var(--accent); color: var(--accent); font-family: var(--mono); font-size: min(.82rem, 14px); font-weight: 500; position: relative; z-index: 2; }
 .step .kind { font-family: var(--mono); font-size: .8rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
 .step h3 { font-size: 1.15rem; font-weight: 600; }
 .step p { color: var(--muted); font-size: .94rem; }
@@ -256,10 +257,18 @@ p, dd, .own span, .note span, .metric span, .job li, .case-flow li li { text-wra
 .checks li { font-family: var(--mono); font-size: .8rem; padding: 3px 8px 3px 7px; border: 1px solid var(--line); border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; }
 .checks li::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--pass); flex: none; }
 .phases li::before, .ship li::before { background: var(--accent); }
-.task { position: absolute; inset: 0; pointer-events: none; opacity: 0; color: var(--accent); }
+.task { position: absolute; inset: 0; pointer-events: none; opacity: 0; color: var(--accent); will-change: transform; }
 .task::before { content: ""; position: absolute; left: -6px; top: -6px; width: 12px; height: 12px; border-radius: 50%; background: currentColor; box-shadow: 0 0 0 4px color-mix(in srgb, currentColor 22%, transparent); }
 .task::after { content: "rejected \2192  back to build"; display: none; position: absolute; left: 14px; top: -9px; white-space: nowrap; font-family: var(--mono); font-size: .72rem; line-height: 18px; color: var(--fail); background: var(--surface); padding: 0 6px; border-radius: 4px; opacity: 0; }
 .steps { contain: layout; }
+.step::before, .step:nth-child(2)::after, .step.gate::after, .steps .step > .ring { content: ""; position: absolute; left: -7px; top: -7px; width: 50px; height: 50px; border-radius: 50%; z-index: 1; opacity: 0; transform: scale(.72); pointer-events: none; grid-column: auto; grid-row: auto; }
+.step::before { background: var(--accent-soft); }
+.step:nth-child(2)::after, .step.gate::after { background: var(--fail-soft); }
+.steps .step > .ring { background: var(--pass-soft); }
+.checks li { position: relative; }
+.checks li::after, .checks li .dot-fail { content: ""; position: absolute; left: 7px; top: calc(50% - 3.5px); width: 7px; height: 7px; border-radius: 50%; opacity: 0; pointer-events: none; }
+.checks li::after { background: var(--idle); }
+.checks li .dot-fail { background: var(--fail); }
 .status-row { display: none; align-items: center; justify-content: space-between; gap: 12px; }
 .anim-toggle { font: inherit; font-family: var(--mono); font-size: .75rem; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; width: 28px; height: 28px; padding: 0; display: grid; place-items: center; cursor: pointer; }
 .anim-toggle:hover { color: var(--accent); border-color: var(--accent); }
@@ -271,7 +280,7 @@ p, dd, .own span, .note span, .metric span, .job li, .case-flow li li { text-wra
 .status .pass { color: var(--pass); }
 [data-anim=paused] *, [data-anim=paused] *::before, [data-anim=paused] *::after { animation-play-state: paused !important; }
 @media (prefers-reduced-motion: no-preference) {
-  .task { animation: task 24s ease-in-out infinite; }
+  .task { animation: task-move 24s ease-in-out infinite, task-tint 24s step-end infinite; }
   .spec > span.more { display: inline-flex; }
   .spec::before { display: block; animation: idle-note 24s ease-in-out infinite; }
   .status-row { display: flex; }
@@ -284,11 +293,15 @@ p, dd, .own span, .note span, .metric span, .job li, .case-flow li li { text-wra
   .status span:nth-child(6) { animation: st-6 24s linear infinite; }
   .status span:nth-child(7) { animation: st-7 24s linear infinite; }
   .status span:nth-child(8) { animation: st-8 24s linear infinite; }
-  .step .node { animation: 24s ease-out infinite; }
-  .step:nth-child(1) .node { animation-name: ping-1; }
-  .step:nth-child(2) .node { animation-name: ping-2; }
-  .step:nth-child(3) .node { animation-name: ping-3; }
-  .step:nth-child(4) .node { animation-name: ping-4; }
+  .step::before, .step:nth-child(2)::after, .step.gate::after, .steps .step > .ring { animation: 24s ease-out infinite; }
+  .step:nth-child(1)::before { animation-name: ping-1; }
+  .step:nth-child(2)::before { animation-name: ping-2; }
+  .step:nth-child(2)::after { animation-name: ping-2-fail; }
+  .step:nth-child(3)::before { animation-name: ping-3; }
+  .step.gate::after { animation-name: ping-3-fail; }
+  .steps .step > .ring { animation-name: ping-3-pass; }
+  .step:nth-child(4)::before { animation-name: ping-4; }
+  .step.gate .node { animation: node-3-tint 24s ease-out infinite; }
   .node .spin { animation: spin 1.4s linear infinite, 24s linear infinite; }
   .step:nth-child(1) .spin { animation-name: spin, spin-1; }
   .step:nth-child(2) .spin { animation-name: spin, spin-2; }
@@ -296,7 +309,7 @@ p, dd, .own span, .note span, .metric span, .job li, .case-flow li li { text-wra
   .step:nth-child(4) .spin { animation-name: spin, spin-4; }
   .step.gate .node::before { animation: badge-fail 24s ease-out infinite; }
   .step.gate .node::after { animation: badge-pass 24s ease-out infinite; }
-  .checks li::before { animation: 24s step-end infinite; }
+  .checks li::before, .checks li::after, .checks li .dot-fail { animation: 24s step-end infinite; }
   .checks li:nth-child(1)::before { animation-name: chk-1; }
   .checks li:nth-child(2)::before { animation-name: chk-2; }
   .checks li:nth-child(3)::before { animation-name: chk-3; }
@@ -308,6 +321,18 @@ p, dd, .own span, .note span, .metric span, .job li, .case-flow li li { text-wra
   .ship li:nth-child(1)::before { animation-name: ship-1; }
   .ship li:nth-child(2)::before { animation-name: ship-2; }
   .ship li:nth-child(3)::before { animation-name: ship-3; }
+  .checks li:nth-child(1)::after { animation-name: chk-1-i; }
+  .checks li:nth-child(2)::after { animation-name: chk-2-i; }
+  .checks li:nth-child(3)::after { animation-name: chk-3-i; }
+  .checks li:nth-child(4)::after { animation-name: chk-4-i; }
+  .checks li:nth-child(5)::after { animation-name: chk-5-i; }
+  .checks li:nth-child(2) .dot-fail { animation-name: chk-2-f; }
+  .phases li:nth-child(1)::after { animation-name: phase-1-i; }
+  .phases li:nth-child(2)::after { animation-name: phase-2-i; }
+  .phases li:nth-child(3)::after { animation-name: phase-3-i; }
+  .ship li:nth-child(1)::after { animation-name: ship-1-i; }
+  .ship li:nth-child(2)::after { animation-name: ship-2-i; }
+  .ship li:nth-child(3)::after { animation-name: ship-3-i; }
   .spec > span:nth-child(1) { animation: agent-1 24s ease-in-out infinite; }
   .spec > span:nth-child(1)::after { animation: agent-bar-1 24s linear infinite; }
   .spec > span:nth-child(1) .lg-claude { animation: mdl-1-claude 24s step-end infinite; }
@@ -401,32 +426,49 @@ p, dd, .own span, .note span, .metric span, .job li, .case-flow li li { text-wra
 @keyframes mdl-7-claude { 0% { opacity: 0; } }
 @keyframes mdl-7-openai { 0% { opacity: 1; } }
 @keyframes mdl-7-qwen { 0% { opacity: 0; } }
-@keyframes ship-1 { 0% { background: var(--idle); } 89.5% { background: var(--accent); } }
-@keyframes ship-2 { 0% { background: var(--idle); } 92% { background: var(--accent); } }
-@keyframes ship-3 { 0% { background: var(--idle); } 94.5% { background: var(--accent); } }
-@keyframes task-m { 0% { transform: translate(18px, var(--y0, 18px)); opacity: 0; z-index: 0; color: var(--accent); } 2%, 10% { transform: translate(18px, var(--y0, 18px)); opacity: 1; } 15%, 25% { transform: translate(18px, var(--y1, 18px)); } 30%, 43.9% { transform: translate(18px, var(--y2, 18px)); z-index: 0; color: var(--accent); } 44% { transform: translate(18px, var(--y2, 18px)); z-index: 3; color: var(--fail); } 49.95% { transform: translate(18px, var(--y1, 18px)); z-index: 3; color: var(--fail); } 50%, 64% { transform: translate(18px, var(--y1, 18px)); z-index: 0; color: var(--accent); } 68%, 82% { transform: translate(18px, var(--y2, 18px)); } 88%, 96% { transform: translate(18px, var(--y3, 18px)); opacity: 1; } 99%, 100% { transform: translate(18px, var(--y3, 18px)); opacity: 0; } }
-@keyframes phase-1 { 0% { background: var(--idle); } 3.5% { background: var(--accent); } }
-@keyframes phase-2 { 0% { background: var(--idle); } 6% { background: var(--accent); } }
-@keyframes phase-3 { 0% { background: var(--idle); } 8.5% { background: var(--accent); } }
+@keyframes ship-1 { 0% { opacity: 0; } 89.5% { opacity: 1; } }
+@keyframes ship-1-i { 0% { opacity: 1; } 89.5% { opacity: 0; } }
+@keyframes ship-2 { 0% { opacity: 0; } 92% { opacity: 1; } }
+@keyframes ship-2-i { 0% { opacity: 1; } 92% { opacity: 0; } }
+@keyframes ship-3 { 0% { opacity: 0; } 94.5% { opacity: 1; } }
+@keyframes ship-3-i { 0% { opacity: 1; } 94.5% { opacity: 0; } }
+@keyframes task-m-move { 0% { transform: translate(18px, var(--y0, 18px)); opacity: 0; } 2%, 10% { transform: translate(18px, var(--y0, 18px)); opacity: 1; } 15%, 25% { transform: translate(18px, var(--y1, 18px)); } 30%, 43.9% { transform: translate(18px, var(--y2, 18px)); } 44% { transform: translate(18px, var(--y2, 18px)); } 49.95% { transform: translate(18px, var(--y1, 18px)); } 50%, 64% { transform: translate(18px, var(--y1, 18px)); } 68%, 82% { transform: translate(18px, var(--y2, 18px)); } 88%, 96% { transform: translate(18px, var(--y3, 18px)); opacity: 1; } 99%, 100% { transform: translate(18px, var(--y3, 18px)); opacity: 0; } }
+@keyframes task-tint { 0% { z-index: 0; color: var(--accent); } 44% { z-index: 3; color: var(--fail); } 50% { z-index: 0; color: var(--accent); } }
+@keyframes phase-1 { 0% { opacity: 0; } 3.5% { opacity: 1; } }
+@keyframes phase-1-i { 0% { opacity: 1; } 3.5% { opacity: 0; } }
+@keyframes phase-2 { 0% { opacity: 0; } 6% { opacity: 1; } }
+@keyframes phase-2-i { 0% { opacity: 1; } 6% { opacity: 0; } }
+@keyframes phase-3 { 0% { opacity: 0; } 8.5% { opacity: 1; } }
+@keyframes phase-3-i { 0% { opacity: 1; } 8.5% { opacity: 0; } }
 @keyframes spin-1 { 0%, 1.9%, 10.1%, 100% { opacity: 0; } 2%, 10% { opacity: 1; } }
 @keyframes spin-2 { 0%, 14.9%, 25.1%, 49.95%, 64.1%, 100% { opacity: 0; } 15%, 25% { opacity: 1; } 50%, 64% { opacity: 1; } }
 @keyframes spin-3 { 0%, 29.9%, 44.05%, 67.9%, 82.1%, 100% { opacity: 0; } 30%, 44% { opacity: 1; } 68%, 82% { opacity: 1; } }
 @keyframes spin-4 { 0%, 87.9%, 96.1%, 100% { opacity: 0; } 88%, 96% { opacity: 1; } }
-@keyframes ping-1 { 0%, 100% { box-shadow: 0 0 0 0 transparent; } 1% { box-shadow: 0 0 0 0 var(--accent-soft); } 3% { box-shadow: 0 0 0 7px var(--accent-soft); } 7% { box-shadow: 0 0 0 0 transparent; } }
-@keyframes ping-2 { 0%, 100% { box-shadow: 0 0 0 0 transparent; } 14% { box-shadow: 0 0 0 0 var(--accent-soft); } 16% { box-shadow: 0 0 0 7px var(--accent-soft); } 20% { box-shadow: 0 0 0 0 transparent; } 49.5% { box-shadow: 0 0 0 0 var(--fail-soft); } 51.75% { box-shadow: 0 0 0 7px var(--fail-soft); } 58.75% { box-shadow: 0 0 0 0 transparent; } }
-@keyframes ping-4 { 0%, 100% { box-shadow: 0 0 0 0 transparent; } 87% { box-shadow: 0 0 0 0 var(--accent-soft); } 89% { box-shadow: 0 0 0 7px var(--accent-soft); } 93% { box-shadow: 0 0 0 0 transparent; } }
-@keyframes ping-3 { 0%, 29% { box-shadow: 0 0 0 0 transparent; border-color: var(--accent); color: var(--accent); background: var(--surface); } 31% { box-shadow: 0 0 0 7px var(--accent-soft); } 35%, 43.9% { box-shadow: 0 0 0 0 transparent; border-color: var(--accent); color: var(--accent); background: var(--surface); } 44.25%, 49% { box-shadow: 0 0 0 7px var(--fail-soft); border-color: var(--fail); color: var(--fail); background: var(--fail-soft); } 51.75%, 81.9% { box-shadow: 0 0 0 0 transparent; border-color: var(--accent); color: var(--accent); background: var(--surface); } 82.5%, 94% { box-shadow: 0 0 0 7px var(--pass-soft); border-color: var(--pass); color: var(--pass); background: var(--pass-soft); } 98%, 100% { box-shadow: 0 0 0 0 transparent; border-color: var(--accent); color: var(--accent); background: var(--surface); } }
+@keyframes ping-1 { 0%, .99% { transform: scale(.72); opacity: 0; } 1% { transform: scale(.72); opacity: 1; } 3% { transform: scale(1); opacity: 1; } 7%, 100% { transform: scale(.72); opacity: 0; } }
+@keyframes ping-2 { 0%, 13.99% { transform: scale(.72); opacity: 0; } 14% { transform: scale(.72); opacity: 1; } 16% { transform: scale(1); opacity: 1; } 20%, 100% { transform: scale(.72); opacity: 0; } }
+@keyframes ping-2-fail { 0%, 49.49% { transform: scale(.72); opacity: 0; } 49.5% { transform: scale(.72); opacity: 1; } 51.75% { transform: scale(1); opacity: 1; } 58.75%, 100% { transform: scale(.72); opacity: 0; } }
+@keyframes ping-4 { 0%, 86.99% { transform: scale(.72); opacity: 0; } 87% { transform: scale(.72); opacity: 1; } 89% { transform: scale(1); opacity: 1; } 93%, 100% { transform: scale(.72); opacity: 0; } }
+@keyframes ping-3 { 0%, 29% { transform: scale(.72); opacity: 0; } 31% { transform: scale(1); opacity: 1; } 35%, 100% { transform: scale(.72); opacity: 0; } }
+@keyframes ping-3-fail { 0%, 43.9% { transform: scale(.72); opacity: 0; } 44.25%, 49% { transform: scale(1); opacity: 1; } 51.75%, 100% { transform: scale(.72); opacity: 0; } }
+@keyframes ping-3-pass { 0%, 81.9% { transform: scale(.72); opacity: 0; } 82.5%, 94% { transform: scale(1); opacity: 1; } 98%, 100% { transform: scale(.72); opacity: 0; } }
+@keyframes node-3-tint { 0%, 29% { border-color: var(--accent); color: var(--accent); background: var(--surface); } 35%, 43.9% { border-color: var(--accent); color: var(--accent); background: var(--surface); } 44.25%, 49% { border-color: var(--fail); color: var(--fail); background: var(--fail-soft); } 51.75%, 81.9% { border-color: var(--accent); color: var(--accent); background: var(--surface); } 82.5%, 94% { border-color: var(--pass); color: var(--pass); background: var(--pass-soft); } 98%, 100% { border-color: var(--accent); color: var(--accent); background: var(--surface); } }
 @keyframes badge-fail { 0%, 43.9% { opacity: 0; transform: scale(.4); } 44.5%, 49% { opacity: 1; transform: scale(1); } 51.75%, 100% { opacity: 0; transform: scale(.4); } }
 @keyframes badge-pass { 0%, 81.9% { opacity: 0; transform: scale(.4); } 83%, 95% { opacity: 1; transform: scale(1); } 98%, 100% { opacity: 0; transform: scale(.4); } }
-@keyframes chk-1 { 0% { background: var(--idle); } 34% { background: var(--pass); } 50% { background: var(--idle); } 70.5% { background: var(--pass); } }
-@keyframes chk-2 { 0% { background: var(--idle); } 39% { background: var(--fail); } 50% { background: var(--idle); } 73% { background: var(--pass); } }
-@keyframes chk-3 { 0% { background: var(--idle); } 75.5% { background: var(--pass); } }
-@keyframes chk-4 { 0% { background: var(--idle); } 78% { background: var(--pass); } }
-@keyframes chk-5 { 0% { background: var(--idle); } 80.5% { background: var(--pass); } }
+@keyframes chk-1 { 0% { opacity: 0; } 34% { opacity: 1; } 50% { opacity: 0; } 70.5% { opacity: 1; } }
+@keyframes chk-1-i { 0% { opacity: 1; } 34% { opacity: 0; } 50% { opacity: 1; } 70.5% { opacity: 0; } }
+@keyframes chk-2 { 0% { opacity: 0; } 73% { opacity: 1; } }
+@keyframes chk-2-i { 0% { opacity: 1; } 39% { opacity: 0; } 50% { opacity: 1; } 73% { opacity: 0; } }
+@keyframes chk-2-f { 0% { opacity: 0; } 39% { opacity: 1; } 50% { opacity: 0; } }
+@keyframes chk-3 { 0% { opacity: 0; } 75.5% { opacity: 1; } }
+@keyframes chk-3-i { 0% { opacity: 1; } 75.5% { opacity: 0; } }
+@keyframes chk-4 { 0% { opacity: 0; } 78% { opacity: 1; } }
+@keyframes chk-4-i { 0% { opacity: 1; } 78% { opacity: 0; } }
+@keyframes chk-5 { 0% { opacity: 0; } 80.5% { opacity: 1; } }
+@keyframes chk-5-i { 0% { opacity: 1; } 80.5% { opacity: 0; } }
 @keyframes loop-red { 0%, 43%, 51.75%, 100% { border-color: var(--muted); } 44.5%, 49.5% { border-color: var(--fail); } }
 @keyframes loop-head { 0%, 43%, 51.75%, 100% { border-top-color: var(--muted); } 44.5%, 49.5% { border-top-color: var(--fail); } }
 @keyframes loop-text { 0%, 43%, 51.75%, 100% { color: var(--muted); } 44.5%, 49.5% { color: var(--fail); } }
-@keyframes task { 0% { transform: translate(18px, 18px); opacity: 0; z-index: 0; color: var(--accent); } 2%, 10% { transform: translate(18px, 18px); opacity: 1; } 15%, 25% { transform: translate(calc(18px + 1 * ((100% - 84px) / 4 + 28px)), 18px); } 30%, 43.9% { transform: translate(calc(18px + 2 * ((100% - 84px) / 4 + 28px)), 18px); z-index: 0; color: var(--accent); } 44% { transform: translate(calc(18px + 2 * ((100% - 84px) / 4 + 28px)), 18px); z-index: 3; color: var(--fail); } 45.5% { transform: translate(calc(18px + 2 * ((100% - 84px) / 4 + 28px)), -32px); } 48.5% { transform: translate(calc(18px + 1 * ((100% - 84px) / 4 + 28px)), -32px); } 49.95% { transform: translate(calc(18px + 1 * ((100% - 84px) / 4 + 28px)), 18px); z-index: 3; color: var(--fail); } 50%, 64% { transform: translate(calc(18px + 1 * ((100% - 84px) / 4 + 28px)), 18px); z-index: 0; color: var(--accent); } 68%, 82% { transform: translate(calc(18px + 2 * ((100% - 84px) / 4 + 28px)), 18px); } 88%, 96% { transform: translate(calc(18px + 3 * ((100% - 84px) / 4 + 28px)), 18px); opacity: 1; } 99%, 100% { transform: translate(calc(18px + 3 * ((100% - 84px) / 4 + 28px)), 18px); opacity: 0; } }
+@keyframes task-move { 0% { transform: translate(18px, 18px); opacity: 0; } 2%, 10% { transform: translate(18px, 18px); opacity: 1; } 15%, 25% { transform: translate(var(--x1, calc(18px + 1 * ((100% - 84px) / 4 + 28px))), 18px); } 30%, 43.9% { transform: translate(var(--x2, calc(18px + 2 * ((100% - 84px) / 4 + 28px))), 18px); } 44% { transform: translate(var(--x2, calc(18px + 2 * ((100% - 84px) / 4 + 28px))), 18px); } 45.5% { transform: translate(var(--x2, calc(18px + 2 * ((100% - 84px) / 4 + 28px))), -32px); } 48.5% { transform: translate(var(--x1, calc(18px + 1 * ((100% - 84px) / 4 + 28px))), -32px); } 49.95% { transform: translate(var(--x1, calc(18px + 1 * ((100% - 84px) / 4 + 28px))), 18px); } 50%, 64% { transform: translate(var(--x1, calc(18px + 1 * ((100% - 84px) / 4 + 28px))), 18px); } 68%, 82% { transform: translate(var(--x2, calc(18px + 2 * ((100% - 84px) / 4 + 28px))), 18px); } 88%, 96% { transform: translate(var(--x3, calc(18px + 3 * ((100% - 84px) / 4 + 28px))), 18px); opacity: 1; } 99%, 100% { transform: translate(var(--x3, calc(18px + 3 * ((100% - 84px) / 4 + 28px))), 18px); opacity: 0; } }
 .case-flow { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .case-flow > li { background: var(--bg); border-radius: 12px; padding: 18px 20px; display: grid; gap: 8px; align-content: start; min-width: 0; }
 .case-flow .kind { font-family: var(--mono); font-size: .8rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
@@ -517,7 +559,7 @@ p, dd, .own span, .note span, .metric span, .job li, .case-flow li li { text-wra
   .step .kind { margin-top: 8px; }
   .loop { display: none; }
   .steps::before { background-image: linear-gradient(180deg, transparent, var(--accent), transparent); background-size: 100% 140px, auto; background-position: 0 -140px, 0 0; }
-  .task { animation-name: task-m; }
+  .task { animation-name: task-m-move, task-tint; }
   .task::after { display: block; left: -30px; top: 0; padding: 0; background: none; writing-mode: vertical-rl; transform: translateY(-50%) rotate(180deg); }
   .status-row { margin-bottom: 18px; }
   .steps { margin-top: 0; }
@@ -619,11 +661,11 @@ p, dd, .own span, .note span, .metric span, .job li, .case-flow li li { text-wra
           <div class="spec" role="group" aria-label="Specialist agents"><span title="backend: Claude / Codex"><span class="mdl" aria-hidden="true"><svg class="lg lg-claude on"><use href="#lg-claude"/></svg><svg class="lg lg-openai"><use href="#lg-openai"/></svg><svg class="lg lg-qwen"><use href="#lg-qwen"/></svg></span>backend</span><span title="data: Claude / Qwen (local)"><span class="mdl" aria-hidden="true"><svg class="lg lg-claude on"><use href="#lg-claude"/></svg><svg class="lg lg-openai"><use href="#lg-openai"/></svg><svg class="lg lg-qwen"><use href="#lg-qwen"/></svg></span>data</span><span title="integrations: Codex / Claude"><span class="mdl" aria-hidden="true"><svg class="lg lg-claude"><use href="#lg-claude"/></svg><svg class="lg lg-openai on"><use href="#lg-openai"/></svg><svg class="lg lg-qwen"><use href="#lg-qwen"/></svg></span>integrations</span><span title="frontend: Qwen (local) / Codex"><span class="mdl" aria-hidden="true"><svg class="lg lg-claude"><use href="#lg-claude"/></svg><svg class="lg lg-openai"><use href="#lg-openai"/></svg><svg class="lg lg-qwen on"><use href="#lg-qwen"/></svg></span>frontend</span><span title="tests: Qwen (local) / Claude"><span class="mdl" aria-hidden="true"><svg class="lg lg-claude"><use href="#lg-claude"/></svg><svg class="lg lg-openai"><use href="#lg-openai"/></svg><svg class="lg lg-qwen on"><use href="#lg-qwen"/></svg></span>tests</span><span title="docs: Qwen (local)"><span class="mdl" aria-hidden="true"><svg class="lg lg-claude"><use href="#lg-claude"/></svg><svg class="lg lg-openai"><use href="#lg-openai"/></svg><svg class="lg lg-qwen on"><use href="#lg-qwen"/></svg></span>docs</span><span class="more" title="backend: Codex"><span class="mdl" aria-hidden="true"><svg class="lg lg-claude"><use href="#lg-claude"/></svg><svg class="lg lg-openai on"><use href="#lg-openai"/></svg><svg class="lg lg-qwen"><use href="#lg-qwen"/></svg></span>backend</span></div>
         </article>
         <article class="step gate">
-          <span class="node">03<span class="spin" aria-hidden="true"></span></span>
+          <i class="ring" aria-hidden="true"></i><span class="node">03<span class="spin" aria-hidden="true"></span></span>
           <span class="kind">Check</span>
           <h3>Review and test</h3>
           <p>Reviewer agents check every change against project memory: notes and past decisions. Then integration, end-to-end and infrastructure tests run. Rejected work goes back to the coding agents.</p>
-          <ul class="checks" aria-label="Checks"><li>memory</li><li>agent review</li><li>integration</li><li>e2e</li><li>infra</li></ul>
+          <ul class="checks" aria-label="Checks"><li>memory</li><li>agent review<i class="dot-fail" aria-hidden="true"></i></li><li>integration</li><li>e2e</li><li>infra</li></ul>
           
         </article>
         <article class="step">
@@ -798,17 +840,23 @@ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(all);all();})(
 (function () {
   var steps = document.querySelector('.steps');
   if (!steps) return;
+  var task = steps.querySelector('.task');
+  function set(k, v) { if (steps.style.getPropertyValue(k) !== v) steps.style.setProperty(k, v); }
   function place() {
     var top = steps.getBoundingClientRect().top;
+    // desktop ball x = 18px + k * (column + gap), in px so the compositor never resolves a %
+    var w = task ? task.getBoundingClientRect().width : 0;
+    for (var k = 1; k < 4 && w; k++) set('--x' + k, (18 + k * ((w - 84) / 4 + 28)) + 'px');
     steps.querySelectorAll('.step .node').forEach(function (n, i) {
       var r = n.getBoundingClientRect();
-      steps.style.setProperty('--y' + i, (r.top - top + r.height / 2) + 'px');
+      set('--y' + i, (r.top - top + r.height / 2) + 'px');
     });
   }
   var t;
   window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(place, 150); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
   document.addEventListener('pipeline-layout', place);
+  if ('ResizeObserver' in window) new ResizeObserver(place).observe(steps);
   place();
 })();
 </script>
@@ -817,8 +865,10 @@ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(all);all();})(
 (function () {
   var box = document.querySelector('.steps'), btn = document.querySelector('.anim-toggle');
   if (!box || !('IntersectionObserver' in window)) return;
-  var root = box.closest('section') || box.parentNode, seen = false, held = false;
-  function apply() { root.setAttribute('data-anim', seen && !held ? 'run' : 'paused'); }
+  var root = box.closest('section') || box.parentNode, started = false, vis = false, held = false;
+  var raf = 0;
+  function write() { raf = 0; var v = started && vis && !held ? 'run' : 'paused'; if (root.getAttribute('data-anim') !== v) root.setAttribute('data-anim', v); }
+  function apply() { if (!raf) raf = requestAnimationFrame(write); }
   // agents come and go; reserve the height of the full list so the stage does not jump
   var spec = box.querySelector('.spec');
   function reserve() {
@@ -837,15 +887,16 @@ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(all);all();})(
   window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(reserve, 150); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(reserve);
   reserve();
-  apply();
-  var mq = window.matchMedia('(max-width: 860px)'), ref = box.querySelector('.step .node');
+  write();
+  var mq = window.matchMedia('(max-width: 860px)'), ref = root.querySelector('.status span');
   function resync() {
     var lead = ref && ref.getAnimations().filter(function (a) { return a.effect.getTiming().duration === 24000; })[0];
     if (!lead) return;
     root.getAnimations({ subtree: true }).forEach(function (a) { if (a !== lead && a.effect.getTiming().duration === 24000) a.currentTime = lead.currentTime; });
   }
   mq.addEventListener('change', function () { requestAnimationFrame(function () { requestAnimationFrame(resync); }); });
-  new IntersectionObserver(function (es) { seen = es[0].isIntersecting; apply(); }, { rootMargin: '0px 0px -30% 0px' }).observe(box);
+  new IntersectionObserver(function (es) { if (es[es.length - 1].isIntersecting) { started = true; apply(); } }, { rootMargin: '0px 0px -30% 0px' }).observe(box);
+  new IntersectionObserver(function (es) { vis = es[es.length - 1].isIntersecting; apply(); }).observe(box);
   if (btn) btn.addEventListener('click', function () {
     held = !held; apply();
     btn.setAttribute('aria-pressed', String(held));
